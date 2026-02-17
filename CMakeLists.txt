@@ -16,6 +16,30 @@ qt_add_qml_module(appPlantDoctor
     URI PlantDoctor
     QML_FILES
         Main.qml
+        RESOURCES
+        QML_FILES ui/app/MainStackView.qml
+        QML_FILES ui/features/home/HomeScreen.qml
+        QML_FILES ui/features/home/HomePage.qml
+        QML_FILES ui/features/camera/CameraScreen.qml
+        QML_FILES ui/features/camera/CameraPage.qml
+        QML_FILES ui/features/camera/RTSCameraPage.qml
+        QML_FILES ui/features/inference/InferenceHistoryPage.qml
+        QML_FILES ui/features/inference/InferenceResultPage.qml
+        QML_FILES ui/features/inference/model/HistoryModel.qml
+        QML_FILES
+        QML_FILES ui/features/inference/delegate/HistoryDelegate.qml
+        QML_FILES ui/features/sensors/SensorPage.qml
+        QML_FILES ui/features/sensors/model/SensorSelectionModel.qml
+        QML_FILES ui/features/sensors/delegate/SensorSelectionDelegate.qml
+        QML_FILES ui/features/sensors/componets/DHTMeter.qml
+        QML_FILES ui/features/settings/SystemSettings.qml
+        QML_FILES
+        QML_FILES
+        QML_FILES
+        QML_FILES
+        RESOURCES
+        QML_FILES ui/components/ImagePreview.qml ui/components/CircularProgressBar.qml ui/components/AvataDrawerTools.qml
+        QML_FILES ui/utils/Utils.js
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

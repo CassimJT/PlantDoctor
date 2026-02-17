@@ -1,0 +1,39 @@
+.
+├── app
+│   └── MainStackView.qml
+│
+├── features
+│   ├── home
+│   │   ├── HomeScreen.qml
+│   │   └── HomePage.qml
+│   │
+│   ├── camera
+│   │   ├── CameraScreen.qml
+│   │   ├── CameraPage.qml
+│   │   └── RTSCameraPage.qml
+│   │
+│   ├── inference
+│   │   ├── InferenceHistoryPage.qml
+│   │   ├── InferenceResultPage.qml
+│   │   ├── HistoryModel.qml
+│   │   └── HistoryDelegate.qml
+│   │
+│   ├── sensors
+│   │   ├── SensorPage.qml
+│   │   ├── SensorSelectionModel.qml
+│   │   ├── SensorSelectionDelegate.qml
+│   │   └── DHTMeter.qml
+│   │
+│   └── settings
+│       └── SystemSettings.qml
+│
+└── shared
+    ├── components
+    │   ├── Header.qml
+    │   ├── HeaderItemes.qml
+    │   ├── CircularProgressBar.qml
+    │   ├── ImagePreview.qml
+    │   └── AvataDrawerTools.qml
+    │
+    └── utils
+        └── Utils.js
