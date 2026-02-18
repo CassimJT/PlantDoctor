@@ -26,17 +26,13 @@ qt_add_qml_module(appPlantDoctor
         QML_FILES ui/features/inference/InferenceHistoryPage.qml
         QML_FILES ui/features/inference/InferenceResultPage.qml
         QML_FILES ui/features/inference/model/HistoryModel.qml
-        QML_FILES
         QML_FILES ui/features/inference/delegate/HistoryDelegate.qml
         QML_FILES ui/features/sensors/SensorPage.qml
         QML_FILES ui/features/sensors/model/SensorSelectionModel.qml
         QML_FILES ui/features/sensors/delegate/SensorSelectionDelegate.qml
         QML_FILES ui/features/sensors/componets/DHTMeter.qml
         QML_FILES ui/features/settings/SystemSettings.qml
-        QML_FILES
-        QML_FILES
-        QML_FILES
-        QML_FILES
+
         RESOURCES
         QML_FILES ui/components/ImagePreview.qml ui/components/CircularProgressBar.qml ui/components/AvataDrawerTools.qml
         QML_FILES ui/utils/Utils.js
@@ -62,4 +58,11 @@ install(TARGETS appPlantDoctor
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+# ----------------------------------------
+# Android package directory
+# ----------------------------------------
+set_property(TARGET appPlantDoctor APPEND PROPERTY
+        QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android
 )
