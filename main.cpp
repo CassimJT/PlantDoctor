@@ -2,10 +2,11 @@
 #include <QQmlApplicationEngine>
 
 
+
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
-
+    qputenv("QT_ANDROID_NO_EXIT_CALL", "true");
     QQmlApplicationEngine engine;
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed,
                      &app, []() { QCoreApplication::exit(-1); },
