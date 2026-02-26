@@ -59,5 +59,8 @@ compile_commands.json
 
 # QtCreator local machine specific files for imported projects
 *creator.user*
+# Ignore large model files
+asserts/model/*.pt
+src/core/executorch/
 
 *_qmlcache.qrc
