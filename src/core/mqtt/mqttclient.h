@@ -2,6 +2,7 @@
 #define MQTTCLIENT_H
 
 #include <QObject>
+#include <QMqttClient>
 
 class MQTTClient : public QObject
 {

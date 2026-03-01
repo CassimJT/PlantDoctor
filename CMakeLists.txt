@@ -46,6 +46,12 @@ qt_add_qml_module(appPlantDoctor
     SOURCES
         src/core/mqtt/mqttclient.cpp
         src/core/mqtt/mqttclient.h
+        src/core/mqtt/pnddevice.h
+        src/core/mqtt/pnddevice.cpp
+        src/core/mqtt/pnddevicemodel.h
+        src/core/mqtt/pnddevicemodel.cpp
+        src/core/mqtt/pnddeviceconfigurator.h
+        src/core/mqtt/pnddeviceconfigurator.cpp
 
 )
 
