@@ -2,6 +2,29 @@ cmake_minimum_required(VERSION 3.16)
 project(PlantDoctor VERSION 0.1 LANGUAGES CXX)
 
 # ─────────────────────────────────────────────────────────────
+# Check for available storage locations
+# ─────────────────────────────────────────────────────────────
+# Define possible base directories in order of preference
+set(POSSIBLE_BASE_DIRS
+    "${CMAKE_CURRENT_SOURCE_DIR}"  # Your friend's location (limited space)
+    "/media/csociety/Backup/CISociety"  # Your location (more space)
+)
+
+# Find first existing directory
+set(WORKSPACE_BASE_DIR "")
+foreach(dir IN LISTS POSSIBLE_BASE_DIRS)
+    if(EXISTS "${dir}")
+        set(WORKSPACE_BASE_DIR "${dir}")
+        message(STATUS "Using workspace base directory: ${WORKSPACE_BASE_DIR}")
+        break()
+    endif()
+endforeach()
+
+if(NOT WORKSPACE_BASE_DIR)
+    message(FATAL_ERROR "No valid workspace base directory found. Tried: ${POSSIBLE_BASE_DIRS}")
+endif()
+
+# ─────────────────────────────────────────────────────────────
 # C++ / Qt setup (moved early, unconditional)
 # ─────────────────────────────────────────────────────────────
 set(CMAKE_CXX_STANDARD 17)
@@ -55,8 +78,6 @@ qt_add_qml_module(appPlantDoctor
         src/core/mqtt/pnddeviceconfigurator.cpp
         src/core/utills/helper.h
         src/core/utills/helper.cpp
-
-
 )
 
 # ─────────────────────────────────────────────────────────────
@@ -73,10 +94,26 @@ if(ANDROID)
 
     if(QTJENNY_GENERATE)
         message(STATUS ">>> QtJenny generation ENABLED (manual flag) <<<")
-        set(GENERATOR_DIR "${CMAKE_CURRENT_SOURCE_DIR}/qtjenny_generator")
-        if(NOT EXISTS "${GENERATOR_DIR}")
-            message(FATAL_ERROR "QtJenny generator directory not found: ${GENERATOR_DIR}")
+
+        # Check multiple possible locations for qtjenny_generator
+        set(POSSIBLE_GENERATOR_DIRS
+            "${CMAKE_CURRENT_SOURCE_DIR}/qtjenny_generator"
+            "${WORKSPACE_BASE_DIR}/qtjenny_generator"
+        )
+
+        set(GENERATOR_DIR "")
+        foreach(dir IN LISTS POSSIBLE_GENERATOR_DIRS)
+            if(EXISTS "${dir}")
+                set(GENERATOR_DIR "${dir}")
+                message(STATUS "Found QtJenny generator at: ${GENERATOR_DIR}")
+                break()
+            endif()
+        endforeach()
+
+        if(NOT GENERATOR_DIR)
+            message(FATAL_ERROR "QtJenny generator directory not found. Tried: ${POSSIBLE_GENERATOR_DIRS}")
         endif()
+
         if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
             set(gradlew_cmd "gradlew.bat")
         else()
@@ -101,8 +138,24 @@ if(ANDROID)
         message(STATUS ">>> QtJenny generation SKIPPED (manual flag is FALSE) <<<")
     endif()
 
-    set(JENNY_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/qtjenny_output/jenny/proxy")
-    if(EXISTS "${JENNY_OUTPUT_DIR}")
+    # Check multiple possible locations for qtjenny_output
+    set(POSSIBLE_OUTPUT_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/qtjenny_output"
+        "${WORKSPACE_BASE_DIR}/qtjenny_output"
+    )
+
+    set(JENNY_OUTPUT_DIR "")
+    foreach(dir IN LISTS POSSIBLE_OUTPUT_DIRS)
+        if(EXISTS "${dir}")
+            set(JENNY_OUTPUT_DIR "${dir}/jenny/proxy")
+            if(EXISTS "${JENNY_OUTPUT_DIR}")
+                message(STATUS "Found QtJenny output at: ${JENNY_OUTPUT_DIR}")
+                break()
+            endif()
+        endif()
+    endforeach()
+
+    if(JENNY_OUTPUT_DIR AND EXISTS "${JENNY_OUTPUT_DIR}")
         file(GLOB JENNY_GENERATED_SOURCES "${JENNY_OUTPUT_DIR}/*.h")
         if(JENNY_GENERATED_SOURCES)
             message(STATUS ">>> Using QtJenny proxies from ${JENNY_OUTPUT_DIR} <<<")
@@ -110,11 +163,25 @@ if(ANDROID)
             message(WARNING "No QtJenny proxy headers found in ${JENNY_OUTPUT_DIR}.")
         endif()
     else()
-        message(STATUS "QtJenny output directory not found: ${JENNY_OUTPUT_DIR}")
+        message(STATUS "QtJenny output directory not found in any location.")
     endif()
 else()
     message(STATUS ">>> Building for Desktop Linux <<<")
-    set(OpenCV_DIR "/media/csociety/Backup/CISociety/Libs/opencv-install/lib/cmake/opencv4" CACHE PATH "OpenCV installation directory")
+
+    # Check multiple possible locations for OpenCV
+    set(POSSIBLE_OPENCV_DIRS
+        "/media/csociety/Backup/CISociety/Libs/opencv-install/lib/cmake/opencv4"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../Libs/opencv-install/lib/cmake/opencv4"
+    )
+
+    set(OpenCV_DIR "" CACHE PATH "OpenCV installation directory")
+    foreach(dir IN LISTS POSSIBLE_OPENCV_DIRS)
+        if(EXISTS "${dir}")
+            set(OpenCV_DIR "${dir}" CACHE PATH "OpenCV installation directory" FORCE)
+            message(STATUS "Found OpenCV at: ${OpenCV_DIR}")
+            break()
+        endif()
+    endforeach()
 endif()
 
 # Add generated sources to executable (after definition)
@@ -136,7 +203,23 @@ endif()
 # ─────────────────────────────────────────────────────────────
 if(ANDROID)
     set(ANDROID_ASSETS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android/src/main/assets")
-    set(MODEL_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/assets/model/plant_disease_model.pte")
+
+    # Check multiple possible locations for model file
+    set(POSSIBLE_MODEL_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/model"
+        "${WORKSPACE_BASE_DIR}/assets/model"
+    )
+
+    set(MODEL_SOURCE "")
+    foreach(dir IN LISTS POSSIBLE_MODEL_DIRS)
+        set(model_path "${dir}/plant_disease_model.pte")
+        if(EXISTS "${model_path}")
+            set(MODEL_SOURCE "${model_path}")
+            message(STATUS "Found model at: ${MODEL_SOURCE}")
+            break()
+        endif()
+    endforeach()
+
     if(EXISTS "${MODEL_SOURCE}")
         file(MAKE_DIRECTORY "${ANDROID_ASSETS_DIR}/model")
         file(COPY "${MODEL_SOURCE}" DESTINATION "${ANDROID_ASSETS_DIR}/model")
@@ -152,7 +235,7 @@ if(ANDROID)
         )
         message(STATUS ">>> Model setup complete <<<")
     else()
-        message(WARNING "Model file not found: ${MODEL_SOURCE}")
+        message(WARNING "Model file not found. Tried: ${POSSIBLE_MODEL_DIRS}")
     endif()
 endif()
 
@@ -161,14 +244,30 @@ endif()
 # ─────────────────────────────────────────────────────────────
 if(ANDROID)
     message(STATUS ">>> Setting up OpenCV for Android <<<")
-    set(OpenCV_DIR "/media/csociety/Backup/CISociety/Libs/OpenCV-android-sdk/sdk/native/jni" CACHE PATH "OpenCV Android directory")
+
+    # Check multiple possible locations for OpenCV Android SDK
+    set(POSSIBLE_OPENCV_ANDROID_DIRS
+        "/media/csociety/Backup/CISociety/Libs/OpenCV-android-sdk/sdk/native/jni"
+        "${WORKSPACE_BASE_DIR}/Libs/OpenCV-android-sdk/sdk/native/jni"
+    )
+
+    set(OpenCV_DIR "" CACHE PATH "OpenCV Android directory")
+    foreach(dir IN LISTS POSSIBLE_OPENCV_ANDROID_DIRS)
+        if(EXISTS "${dir}")
+            set(OpenCV_DIR "${dir}" CACHE PATH "OpenCV Android directory" FORCE)
+            message(STATUS "Found OpenCV Android SDK at: ${OpenCV_DIR}")
+            break()
+        endif()
+    endforeach()
+
     if(EXISTS "${OpenCV_DIR}")
         find_package(OpenCV REQUIRED)
         target_include_directories(appPlantDoctor PRIVATE ${OpenCV_INCLUDE_DIRS})
         target_link_libraries(appPlantDoctor PRIVATE ${OpenCV_LIBS})
     else()
-        message(FATAL_ERROR "OpenCV Android directory not found: ${OpenCV_DIR}")
+        message(FATAL_ERROR "OpenCV Android directory not found. Tried: ${POSSIBLE_OPENCV_ANDROID_DIRS}")
     endif()
+
     if(EXISTS "${JENNY_OUTPUT_DIR}")
         target_include_directories(appPlantDoctor PRIVATE ${JENNY_OUTPUT_DIR})
     endif()
@@ -177,7 +276,21 @@ endif()
 # ─────────────────────────────────────────────────────────────
 # ExecuTorch setup
 # ─────────────────────────────────────────────────────────────
-set(EXECUTORCH_DIR "${CMAKE_SOURCE_DIR}/src/core/executorch")
+# Check multiple possible locations for ExecuTorch
+set(POSSIBLE_EXECUTORCH_DIRS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/executorch"
+    "${WORKSPACE_BASE_DIR}/executorch"
+)
+
+set(EXECUTORCH_DIR "")
+foreach(dir IN LISTS POSSIBLE_EXECUTORCH_DIRS)
+    if(EXISTS "${dir}")
+        set(EXECUTORCH_DIR "${dir}")
+        message(STATUS "Found ExecuTorch at: ${EXECUTORCH_DIR}")
+        break()
+    endif()
+endforeach()
+
 if(EXISTS "${EXECUTORCH_DIR}")
     if(ANDROID)
         set(EXECUTORCH_BUILD_EXTENSION_LLM OFF CACHE BOOL "Disable LLM extension")
@@ -210,7 +323,7 @@ if(EXISTS "${EXECUTORCH_DIR}")
     )
     target_include_directories(appPlantDoctor PRIVATE ${EXECUTORCH_DIR})
 else()
-    message(WARNING "ExecuTorch directory not found: ${EXECUTORCH_DIR}")
+    message(WARNING "ExecuTorch directory not found. Tried: ${POSSIBLE_EXECUTORCH_DIRS}")
 endif()
 
 # ─────────────────────────────────────────────────────────────
@@ -264,6 +377,7 @@ install(TARGETS appPlantDoctor
 message(STATUS "========================================")
 message(STATUS "Project: ${PROJECT_NAME}")
 message(STATUS "Version: ${PROJECT_VERSION}")
+message(STATUS "Workspace base: ${WORKSPACE_BASE_DIR}")
 if(ANDROID)
     message(STATUS "Platform: Android")
     if(DEFINED ANDROID_ABI)
@@ -276,6 +390,7 @@ if(ANDROID)
     endif()
 else()
     message(STATUS "Platform: Desktop Linux")
+    message(STATUS "OpenCV dir: ${OpenCV_DIR}")
 endif()
 message(STATUS "Qt version: ${Qt6_VERSION}")
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
