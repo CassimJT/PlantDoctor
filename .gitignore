@@ -62,5 +62,6 @@ compile_commands.json
 # Ignore large model files
 asserts/model/*.pt
 src/core/executorch/
+assets/modles/
 
 *_qmlcache.qrc

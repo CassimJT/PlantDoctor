@@ -27,13 +27,11 @@ qt_add_qml_module(appPlantDoctor
         Main.qml
         ui/app/MainStackView.qml
         ui/features/home/HomeScreen.qml
-        ui/features/home/HomePage.qml
         ui/features/camera/CameraScreen.qml
         ui/features/camera/CameraPage.qml
         ui/features/camera/RTSCameraPage.qml
         ui/features/inference/InferenceHistoryPage.qml
         ui/features/inference/InferenceResultPage.qml
-        ui/features/inference/model/HistoryModel.qml
         ui/features/inference/delegate/HistoryDelegate.qml
         ui/features/sensors/SensorPage.qml
         ui/features/sensors/model/SensorSelectionModel.qml
@@ -42,7 +40,10 @@ qt_add_qml_module(appPlantDoctor
         ui/components/ImagePreview.qml
         ui/components/CircularProgressBar.qml
         ui/components/AvataDrawerTools.qml
-        ui/app/AppBar.qml
+        ui/components/AppBar.qml
+        ui/features/home/componetes/SideBar.qml
+        ui/components/AppBarItemes.qml
+        ui/utils/Utils.js
     SOURCES
         src/core/mqtt/mqttclient.cpp
         src/core/mqtt/mqttclient.h
@@ -52,6 +53,9 @@ qt_add_qml_module(appPlantDoctor
         src/core/mqtt/pnddevicemodel.cpp
         src/core/mqtt/pnddeviceconfigurator.h
         src/core/mqtt/pnddeviceconfigurator.cpp
+        src/core/utills/helper.h
+        src/core/utills/helper.cpp
+
 
 )
 

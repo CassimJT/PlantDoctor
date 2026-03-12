@@ -1,4 +1,4 @@
-.
+UI
 ├── app
 │   └── MainStackView.qml
 │
@@ -27,9 +27,8 @@
 │   └── settings
 │       └── SystemSettings.qml
 │
-└── shared
-    ├── components
-    │   ├── Header.qml
+├── components
+    ├── Header.qml
     │   ├── HeaderItemes.qml
     │   ├── CircularProgressBar.qml
     │   ├── ImagePreview.qml

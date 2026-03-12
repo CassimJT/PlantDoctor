@@ -1,5 +1,15 @@
 <RCC>
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
+        <file>ui/features/inference/model/HistoryModel.qml</file>
+        <file>assets/home/top_curtain_drag_back.svg</file>
+        <file>assets/home/top_curtain_drag.svg</file>
+        <file>assets/home/menu.svg</file>
+        <file>assets/home/delete.png</file>
+        <file>assets/home/curtain_shadow_handle.svg</file>
+        <file>assets/home/clear.png</file>
+        <file>assets/home/back.svg</file>
+        <file>assets/home/adimage.png</file>
+        <file>assets/home/doted-menu.svg</file>
     </qresource>
 </RCC>

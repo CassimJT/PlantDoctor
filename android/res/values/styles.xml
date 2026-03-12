@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- THIS is the key: shown immediately on cold start, no black flash -->
+    <!-- Launch theme with dark text on light background -->
     <style name="LaunchTheme" parent="Theme.AppCompat.Light.NoActionBar">
-       <!-- <item name="android:windowBackground">@drawable/splashscreen</item> -->
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:statusBarColor">#ffffff</item>
+        <item name="android:windowLightStatusBar">true</item>  <!-- Dark text -->
+        <item name="android:statusBarColor">#FFFFFF</item>     <!-- Light background -->
     </style>
 
-    <!-- Your existing themes -->
+    <!-- Main app theme with dark text on light background -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/white</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">true</item>   <!-- Dark text -->
         <item name="android:statusBarColor">@android:color/white</item>
     </style>
 
+    <!-- Qt specific theme -->
     <style name="QtAppTheme" parent="AppTheme">
         <item name="android:colorPrimary">@android:color/white</item>
         <item name="android:colorPrimaryDark">@android:color/white</item>
         <item name="colorAccent">#FF6200EE</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:statusBarColor">#ffffff</item>
+        <item name="android:windowLightStatusBar">true</item>   <!-- Dark text -->
+        <item name="android:statusBarColor">@android:color/transparent</item>  <!-- or #00000000 -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
 </resources>
