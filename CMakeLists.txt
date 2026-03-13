@@ -253,7 +253,7 @@ if(ANDROID)
     # Check multiple possible locations for OpenCV Android SDK
     set(POSSIBLE_OPENCV_ANDROID_DIRS
         "/media/csociety/Backup/CISociety/Libs/OpenCV-android-sdk/sdk/native/jni"
-        "${WORKSPACE_BASE_DIR}/Libs/OpenCV-android-sdk/sdk/native/jni"
+        "${WORKSPACE_BASE_DIR}/src/Libs/OpenCV-android-sdk/sdk/native/jni"
     )
 
     set(OpenCV_DIR "" CACHE PATH "OpenCV Android directory")
