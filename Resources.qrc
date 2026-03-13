@@ -15,5 +15,6 @@
         <file>assets/appbar/hotline.svg</file>
         <file>assets/appbar/dashboard.svg</file>
         <file>assets/home/back.svg</file>
+        <file>assets/home/icons8-camera-90.png</file>
     </qresource>
 </RCC>

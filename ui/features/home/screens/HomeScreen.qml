@@ -115,17 +115,20 @@ Page {
 
                 // Camera Icon Button
                 Rectangle {
-                    width: 50
-                    height: 50
-                    radius: 25
+                    width: 60
+                    height: 60
+                    radius: 30
                     color: "white"
                     anchors.centerIn: parent
 
                     // will have to replace this with an icon
-                    Text {
+                    Image {
+                        id: cameraIcon
+                        source: "qrc:/assets/home/icons8-camera-90.png"
+                        width: 50
+                        height: 50
+                        fillMode: Image.PreserveAspectFit
                         anchors.centerIn: parent
-                        text: "📷" //have to add a camera icon later
-                        font.pixelSize: 24
                     }
                 }
 
