@@ -8,8 +8,12 @@
         <file>assets/home/delete.png</file>
         <file>assets/home/curtain_shadow_handle.svg</file>
         <file>assets/home/clear.png</file>
-        <file>assets/home/back.svg</file>
         <file>assets/home/adimage.png</file>
         <file>assets/home/doted-menu.svg</file>
+        <file>assets/appbar/settings.svg</file>
+        <file>assets/appbar/pest.svg</file>
+        <file>assets/appbar/hotline.svg</file>
+        <file>assets/appbar/dashboard.svg</file>
+        <file>assets/home/back.svg</file>
     </qresource>
 </RCC>

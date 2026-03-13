@@ -32,7 +32,14 @@ Item {
                 RoundButton {
                     id: menu
                     Layout.leftMargin: 10
-                    icon.source: "qrc:/assets/home/menu.svg"
+                    icon.source: {
+                        if(mainLoader.item && mainLoader.item.mainStackView.depth > 1) {
+                            return  "qrc:/assets/home/back.svg"
+                        }else {
+                            return  "qrc:/assets/home/menu.svg"
+                        }
+                    }
+
                     //icon.color: "#333"
                     Material.background: "#f5f5f5"
                     icon.width: 26
@@ -47,23 +54,73 @@ Item {
                     text: qsTr("PlantDoctor")
                     font.pixelSize: 14
                     font.weight: Font.Medium
-                    Material.elevation: 2
+                    Layout.leftMargin: 30
                 }
-
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
                 RoundButton {
                     id: dotedmenu
                     Layout.rightMargin: 10
                     icon.source: "qrc:/assets/home/doted-menu.svg"
                     Material.background: "#f5f5f5"
-                    //icon.color: "#333"
                     icon.width: 26
                     icon.height: 26
                     Layout.alignment: Qt.AlignRight
-                    //flat: true
+                    visible: mainLoader.item && mainLoader.item.mainStackView.depth === 1 ? true : false
                     onClicked: {
-                        //
+                        appMenu.open()
+                    }
+                    Menu {
+                        id: appMenu
+                        onAboutToShow: {
+                            x = dotedmenu.width - width
+                            y = dotedmenu.height
+                        }
+
+                        MenuItem {
+                            icon.source: "qrc:/assets/appbar/dashboard.svg"
+                            text: qsTr("Sensors")
+                            onClicked: {
+                                mainLoader.item && mainLoader.item.mainStackView.push("../features/sensors/screens/SensorDashboard.qml")
+                            }
+                        }
+
+                        MenuSeparator{}
+
+                        MenuItem {
+                            icon.source: "qrc:/assets/appbar/pest.svg"
+                            text: qsTr("Live Monitor")
+                            onClicked: {
+                                mainLoader.item && mainLoader.item.mainStackView.push("../features/sensors/screens/LiveMonitorScreen.qml")
+
+                            }
+                        }
+
+                        MenuSeparator{}
+
+                        MenuItem {
+                            icon.source: "qrc:/assets/appbar/settings.svg"
+                            text: qsTr("Settings")
+                            onClicked: {
+                                mainLoader.item && mainLoader.item.mainStackView.push("../features/sensors/screens/SettingsScreen.qml")
+
+                            }
+                        }
+                        MenuSeparator{}
+
+                        MenuItem {
+                            icon.source: "qrc:/assets/appbar/hotline.svg"
+                            text: qsTr("Hotlines")
+                            onClicked: {
+                                mainLoader.item && mainLoader.item.mainStackView.push("../features/sensors/screens/Hotlines.qml")
+
+                            }
+                        }
                     }
                 }
+
             }
 
         }
@@ -75,6 +132,7 @@ Item {
 
         }
     }
+
 
 }
 
