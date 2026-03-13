@@ -80,6 +80,8 @@ qt_add_qml_module(appPlantDoctor
         src/core/mqtt/pnddeviceconfigurator.cpp
         src/core/utills/helper.h
         src/core/utills/helper.cpp
+        QML_FILES ui/features/auth/screens/SignInScreen.qml
+        QML_FILES ui/features/auth/screens/SignUpScreen.qml
 
 )
 
