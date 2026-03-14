@@ -25,7 +25,7 @@ Page {
                 Image {
                     anchors.fill: parent
                     anchors.margins: 10
-                    source: "leaf.png"   // have to add a photo later
+                    source: "qrc:/assets/home/leaf.png"   // have to add a photo later
                     fillMode: Image.PreserveAspectFit
                 }
 
@@ -137,23 +137,19 @@ Page {
             }
 
             // Upload Button
-            Rectangle {
-                id: uploadField
-                width: 150
-                height: 40
-                radius: 10
-                color: "#6c7a6a"
+
+            Button{
+                id:uploadButton
+                text: "Upload Photo"
+                icon.source: "qrc:/assets/home/upload-photo-68.png"
+                icon.width: 30
+                icon.height: 30
                 anchors.horizontalCenter: parent.horizontalCenter
-
-                //have to add an upload icon here later
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "Upload Photo"
-                    color: "white"
-                    font.bold: true
-                }
+                font.pointSize: 18
+                font.bold: true
             }
+
+
         }
     }
 }

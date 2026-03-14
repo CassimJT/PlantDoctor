@@ -176,7 +176,7 @@ else()
     # Check multiple possible locations for OpenCV
     set(POSSIBLE_OPENCV_DIRS
         "/media/csociety/Backup/CISociety/Libs/opencv-install/lib/cmake/opencv4"
-        "${CMAKE_CURRENT_SOURCE_DIR}/../Libs/opencv-install/lib/cmake/opencv4"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Libs/opencv-install/lib/cmake/opencv4"
     )
 
     set(OpenCV_DIR "" CACHE PATH "OpenCV installation directory")
