@@ -1,5 +1,5 @@
 import QtQuick 2.15
-
-Item {
-
+import QtQuick.Controls
+Page {
+    objectName: "Camera"
 }

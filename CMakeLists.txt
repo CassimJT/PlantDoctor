@@ -82,7 +82,8 @@ qt_add_qml_module(appPlantDoctor
         src/core/utills/helper.h
         src/core/utills/helper.cpp
         src/core/mqtt/pnddevicestate.h
-        src/core/mqtt/pndtopics.h src/core/mqtt/pndtopics.cpp
+        src/core/mqtt/pndtopics.h
+        src/core/mqtt/pndtopics.cpp
 )
 
 # ─────────────────────────────────────────────────────────────

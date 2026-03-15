@@ -25,23 +25,23 @@ Drawer {
         }
     }
     //-----SortFilterProxyModel
-    SortFilterProxyModel {
-        id: filterModel
-        model: HistoryModel.listmodel
-        filters: [
-            FunctionFilter {
-                component RoleData: QtObject {
-                    property string diseaseName
-                }
-                function filter(data: RoleData) : bool {
+      SortFilterProxyModel {
+          id: filterModel
+          model: HistoryModel.listmodel
+          filters: [
+              FunctionFilter {
+                  component RoleData: QtObject {
+                      property string diseaseName
+                  }
+                  function filter(data: RoleData) : bool {
 
-                    if (searchField.text === "")
-                        return true
-                    return data.diseaseName && data.diseaseName.toLowerCase().includes(searchField.text.toLowerCase())
-                }
-            }
-        ]
-    }
+                      if (searchField.text === "")
+                          return true
+                      return data.diseaseName && data.diseaseName.toLowerCase().includes(searchField.text.toLowerCase())
+                  }
+              }
+          ]
+      }
     Label {
         id: hisoryLable
         text: qsTr("History")
