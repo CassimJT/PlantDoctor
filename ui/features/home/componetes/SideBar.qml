@@ -59,7 +59,7 @@ Drawer {
         anchors {
             top: hisoryLable.bottom
             left: parent.left
-            bottom: parent.bottom
+            bottom: user_id.top
             leftMargin: 25
             topMargin: 10
             bottomMargin: 10
@@ -90,7 +90,7 @@ Drawer {
         anchors {
             top: hisoryLable.bottom
             right: parent.right
-            bottom: parent.bottom
+            bottom: user_id.top
             left: frame.right
         }
     }
@@ -103,7 +103,7 @@ Drawer {
         Material.elevation: 8
         anchors {
             right: parent.right
-            bottom: parent.bottom
+            bottom: user_id.top
             rightMargin: 25
         }
         Image {
@@ -131,6 +131,57 @@ Drawer {
         onAccepted:  {
             HistoryModel.clearModel()
            // filterModel.invalidate()
+        }
+    }
+    ItemDelegate {
+        id: user_id
+        height: 60
+        background: Rectangle {
+            color: "#333"
+            radius: 8
+            opacity: 0.3
+        }
+        Row {
+            height: parent.height
+            spacing: 5
+            padding: 10
+            Rectangle {
+                id: circle
+                width: 40
+                height: width
+                radius: width / 2
+                color: "#8BC34A"
+                Text {
+                    id: latter
+                    text: qsTr("C")
+                    font.bold: true
+                    color: "grey"
+                    anchors.centerIn: parent
+                }
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+            }
+            Text {
+                id: user_email
+                text: qsTr("SignIn")
+                color: "#333"
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+            }
+
+        }
+        anchors {
+            bottom: parent.bottom
+            right: parent.right
+            left: parent.left
+            margins: 8
+        }
+        //move to SigninPage if not alrady signed in
+        onClicked:  {
+             mainLoader.item && mainLoader.item.mainStackView.push("../../auth/screens/SignInScreen.qml")
+            drawer.close()
         }
     }
 }

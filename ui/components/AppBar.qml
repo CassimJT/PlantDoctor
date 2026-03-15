@@ -51,7 +51,9 @@ Item {
                 }
                 Label {
                     id: tittle
-                    text: qsTr("PlantDoctor")
+                    text:  mainRoot.mainStackView?.currentItem?.objectName || "PlantDoctor"
+
+
                     font.pixelSize: 14
                     font.weight: Font.Medium
                     Layout.leftMargin: 30

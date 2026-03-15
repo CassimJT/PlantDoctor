@@ -3,6 +3,7 @@ import QtQuick.Controls
 
 Page {
     id: homescreeen
+    objectName: "PlantDoctor"
     BusyIndicator {
         anchors.centerIn: parent
     }

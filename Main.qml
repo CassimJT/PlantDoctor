@@ -12,7 +12,8 @@ ApplicationWindow {
     property bool isDarkTheme: false
     property alias drawer: drawer
     property bool exitConfirmed: false
-    // Modern Android-friendly flags (Qt 6.9+)
+    property var mainStackView
+
     flags: {
         if (Qt.platform.os === "android") {
             return Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
@@ -77,12 +78,13 @@ ApplicationWindow {
                        close.accepted = false
                        confirmExitDialog.open()
                    } else {
-                       // Allow the close to proceed
                        close.accepted = true
                    }
                }
 
     Component.onCompleted: {
         Helper.setStatusBarAppearance(Qt.rgba(0,0,0,0),true)
+        mainStackView = mainLoader.item.mainStackView
     }
+
 }

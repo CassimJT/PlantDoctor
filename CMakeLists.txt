@@ -51,7 +51,6 @@ qt_add_qml_module(appPlantDoctor
         ui/app/MainStackView.qml
         ui/features/home/screens/HomeScreen.qml
         ui/features/inference/delegate/HistoryDelegate.qml
-        ui/features/sensors/SensorPage.qml
         ui/features/sensors/model/SensorSelectionModel.qml
         ui/features/sensors/delegate/SensorSelectionDelegate.qml
         ui/features/settings/SystemSettings.qml
@@ -69,6 +68,8 @@ qt_add_qml_module(appPlantDoctor
         ui/features/sensors/screens/LiveMonitorScreen.qml
         ui/features/sensors/screens/Hotlines.qml
         ui/features/home/screens/CameraScreen.qml
+        ui/features/auth/screens/SignInScreen.qml
+        ui/features/auth/screens/SignUpScreen.qml
     SOURCES
         src/core/mqtt/mqttclient.cpp
         src/core/mqtt/mqttclient.h
@@ -80,8 +81,8 @@ qt_add_qml_module(appPlantDoctor
         src/core/mqtt/pnddeviceconfigurator.cpp
         src/core/utills/helper.h
         src/core/utills/helper.cpp
-        QML_FILES ui/features/auth/screens/SignInScreen.qml
-        QML_FILES ui/features/auth/screens/SignUpScreen.qml
+        src/core/mqtt/pnddevicestate.h
+        src/core/mqtt/pndtopics.h src/core/mqtt/pndtopics.cpp
 
 )
 
@@ -176,7 +177,7 @@ else()
     # Check multiple possible locations for OpenCV
     set(POSSIBLE_OPENCV_DIRS
         "/media/csociety/Backup/CISociety/Libs/opencv-install/lib/cmake/opencv4"
-        "${CMAKE_CURRENT_SOURCE_DIR}/../Libs/opencv-install/lib/cmake/opencv4"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Libs/opencv-install/lib/cmake/opencv4"
     )
 
     set(OpenCV_DIR "" CACHE PATH "OpenCV installation directory")
