@@ -11,21 +11,51 @@ Page {
 
         ColumnLayout {
             anchors.centerIn: parent
-            spacing: 20
 
+
+               // App Logo
+               Image {
+                   id: appLogo
+                   source: "qrc:/assets/home/logo.png"
+                   fillMode: Image.PreserveAspectFit
+
+                   Layout.preferredWidth: 80
+                   Layout.preferredHeight: 80
+                   Layout.alignment: Qt.AlignHCenter
+               }
+               // Welcome Text
+               Text {
+                   id: welcomeText
+                   text: qsTr("Welcome!")
+                   font.bold: true
+                   font.pointSize: 25
+
+                   Layout.alignment: Qt.AlignHCenter
+               }
+
+               Item {
+                   Layout.preferredWidth: 10
+                   Layout.preferredHeight: 30
+               }
             // Camera Preview Area
             Rectangle {
                 id: cameraField
-                width: 260
-                height: 320
+               Layout.preferredWidth: 260
+                Layout.preferredHeight: 320
                 radius: 20
                 color: "#cfd8cc"
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        cameraField.color = "green"
+                    }
+                }
 
                 // Placeholder image (what camera would show)
                 Image {
                     anchors.fill: parent
                     anchors.margins: 10
-                    source: "qrc:/assets/home/leaf.png"   // have to add a photo later
+                    source: "qrc:/assets/home/leaf.png"
                     fillMode: Image.PreserveAspectFit
                 }
 
@@ -118,8 +148,12 @@ Page {
                     width: 60
                     height: 60
                     radius: 30
-                    color: "white"
+                    color: "#ffffff"
+                    opacity: 0.4
+                    border.color: "white"
+                    border.width: 1
                     anchors.centerIn: parent
+
 
                     // will have to replace this with an icon
                     Image {
@@ -129,6 +163,7 @@ Page {
                         height: 50
                         fillMode: Image.PreserveAspectFit
                         anchors.centerIn: parent
+                        opacity: 0.6
                     }
                 }
 
@@ -144,7 +179,7 @@ Page {
                 icon.source: "qrc:/assets/home/upload-photo-68.png"
                 icon.width: 30
                 icon.height: 30
-                anchors.horizontalCenter: parent.horizontalCenter
+                 Layout.alignment: Qt.AlignHCenter
                 font.pointSize: 18
                 font.bold: true
             }
