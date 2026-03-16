@@ -84,6 +84,10 @@ qt_add_qml_module(appPlantDoctor
         src/core/mqtt/pnddevicestate.h
         src/core/mqtt/pndtopics.h
         src/core/mqtt/pndtopics.cpp
+        src/core/infarence/infarencerunner.h
+        src/core/infarence/infarencerunner.cpp
+        src/core/infarence/diseaseinfomanager.h
+        src/core/infarence/diseaseinfomanager.cpp
 )
 
 # ─────────────────────────────────────────────────────────────
@@ -205,43 +209,116 @@ else()
 endif()
 
 # ─────────────────────────────────────────────────────────────
-# Android model packaging
+# Android assets packaging
 # ─────────────────────────────────────────────────────────────
 if(ANDROID)
     set(ANDROID_ASSETS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android/src/main/assets")
+    set(ANDROID_BUILD_ASSETS_DIR "${CMAKE_BINARY_DIR}/android-build-appPlantDoctor/assets")
 
-    # Check multiple possible locations for model file
+    # Create assets directories
+    file(MAKE_DIRECTORY "${ANDROID_ASSETS_DIR}/model")
+    file(MAKE_DIRECTORY "${ANDROID_ASSETS_DIR}/languages")
+
+    # ─────────────────────────────────────────────────────────
+    # 1. Model file
+    # ─────────────────────────────────────────────────────────
     set(POSSIBLE_MODEL_DIRS
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/model"
         "${WORKSPACE_BASE_DIR}/assets/model"
+        "${CMAKE_CURRENT_SOURCE_DIR}/model"
     )
 
-    set(MODEL_SOURCE "")
+    set(MODEL_FOUND FALSE)
     foreach(dir IN LISTS POSSIBLE_MODEL_DIRS)
         set(model_path "${dir}/plant_disease_model.pte")
         if(EXISTS "${model_path}")
-            set(MODEL_SOURCE "${model_path}")
-            message(STATUS "Found model at: ${MODEL_SOURCE}")
+            message(STATUS "Found model at: ${model_path}")
+
+            # Copy to source assets
+            file(COPY "${model_path}" DESTINATION "${ANDROID_ASSETS_DIR}/model")
+
+            # Setup post-build copy
+            add_custom_command(
+                TARGET appPlantDoctor POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${ANDROID_BUILD_ASSETS_DIR}/model"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${model_path}"
+                    "${ANDROID_BUILD_ASSETS_DIR}/model/plant_disease_model.pte"
+                COMMENT ">>> Copying model to build assets"
+            )
+            set(MODEL_FOUND TRUE)
             break()
         endif()
     endforeach()
 
-    if(EXISTS "${MODEL_SOURCE}")
-        file(MAKE_DIRECTORY "${ANDROID_ASSETS_DIR}/model")
-        file(COPY "${MODEL_SOURCE}" DESTINATION "${ANDROID_ASSETS_DIR}/model")
+    if(NOT MODEL_FOUND)
+        message(WARNING "Model file not found. Tried: ${POSSIBLE_MODEL_DIRS}")
+    endif()
 
-        set(ANDROID_BUILD_ASSETS_DIR "${CMAKE_BINARY_DIR}/android-build-appPlantDoctor/assets")
+    # ─────────────────────────────────────────────────────────
+    # 2. Language files
+    # ─────────────────────────────────────────────────────────
+    set(POSSIBLE_LANG_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/languages"
+        "${CMAKE_CURRENT_SOURCE_DIR}/languages"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/infarence/languages"
+    )
+
+    set(LANGUAGE_FILES
+        diseases_en.json
+        diseases_ny.json
+    )
+
+    set(LANG_FILES_FOUND "")
+
+    foreach(LANG_FILE IN LISTS LANGUAGE_FILES)
+        set(FILE_FOUND FALSE)
+        foreach(dir IN LISTS POSSIBLE_LANG_DIRS)
+            set(lang_path "${dir}/${LANG_FILE}")
+            if(EXISTS "${lang_path}")
+                message(STATUS "Found language file: ${lang_path}")
+
+                # Copy to source assets
+                file(COPY "${lang_path}" DESTINATION "${ANDROID_ASSETS_DIR}/languages")
+
+                # Track for post-build copy
+                list(APPEND LANG_FILES_FOUND "${lang_path}")
+                set(FILE_FOUND TRUE)
+                break()
+            endif()
+        endforeach()
+
+        if(NOT FILE_FOUND)
+            message(WARNING "Language file not found: ${LANG_FILE}")
+        endif()
+    endforeach()
+
+    # Post-build copy for language files
+    if(LANG_FILES_FOUND)
         add_custom_command(
             TARGET appPlantDoctor POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory "${ANDROID_BUILD_ASSETS_DIR}/model"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${ANDROID_BUILD_ASSETS_DIR}/languages"
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${MODEL_SOURCE}"
-                "${ANDROID_BUILD_ASSETS_DIR}/model/plant_disease_model.pte"
-            COMMENT ">>> Copying model to build-target assets for APK packaging"
+                ${LANG_FILES_FOUND}
+                "${ANDROID_BUILD_ASSETS_DIR}/languages/"
+            COMMENT ">>> Copying language files to build assets"
         )
-        message(STATUS ">>> Model setup complete <<<")
+    endif()
+
+    # ─────────────────────────────────────────────────────────
+    # Summary
+    # ─────────────────────────────────────────────────────────
+    message(STATUS ">>> Android assets setup complete <<<")
+    if(MODEL_FOUND)
+        message(STATUS " Model: plant_disease_model.pte")
     else()
-        message(WARNING "Model file not found. Tried: ${POSSIBLE_MODEL_DIRS}")
+        message(STATUS " Model: NOT FOUND")
+    endif()
+
+    if(LANG_FILES_FOUND)
+        message(STATUS " Languages: ${LANGUAGE_FILES}")
+    else()
+        message(STATUS " Languages: NOT FOUND")
     endif()
 endif()
 

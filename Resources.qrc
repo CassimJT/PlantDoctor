@@ -20,5 +20,7 @@
         <file>assets/home/upload-photo-68.png</file>
         <file>assets/home/logo.png</file>
         <file>assets/home/gallery-96.png</file>
+        <file>assets/languages/diseases_ny.json</file>
+        <file>assets/languages/diseases_en.json</file>
     </qresource>
 </RCC>

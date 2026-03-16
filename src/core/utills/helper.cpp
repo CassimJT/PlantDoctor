@@ -48,7 +48,7 @@ void Helper::loadImageFromContentUri(const QString &uriString)
         }
 
         QJniObject base64Str = QJniObject::callStaticObjectMethod(
-            "com/plantGPT/GalleryHelper",
+            "com/plantdoctor/GalleryHelper",
             "loadContentUri",
             "(Landroid/app/Activity;Ljava/lang/String;)Ljava/lang/String;",
             activity.object<jobject>(),
