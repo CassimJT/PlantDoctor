@@ -14,6 +14,8 @@
 #if defined(Q_OS_ANDROID)
 #include <QJniObject>
 #include <QJniEnvironment>
+#include <QPermission>
+#include <QImage>
 #endif
 
 
@@ -26,6 +28,7 @@ public:
     explicit Helper(QObject *parent = nullptr);
     bool getIsHompage() const;
     Q_INVOKABLE void setStatusBarAppearance(const QColor &backgroundColor, bool darkIcons);
+    Q_INVOKABLE void requestCameraPeremision();
 
 public slots:
     void setIsHompage(bool newIsHompage);
