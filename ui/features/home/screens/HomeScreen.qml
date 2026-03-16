@@ -32,6 +32,15 @@ Page {
 
                    Layout.alignment: Qt.AlignHCenter
                }
+               Text {
+                   id: hint
+                   text: qsTr("Tap the camera icon to capture a photo or select from Gallery")
+
+                   font.pointSize: 12
+
+
+                    Layout.alignment: Qt.AlignHCenter
+               }
 
                Item {
                    Layout.preferredWidth: 10
@@ -40,14 +49,15 @@ Page {
             // Camera Preview Area
             Rectangle {
                 id: cameraField
-               Layout.preferredWidth: 260
+                Layout.preferredWidth: 260
                 Layout.preferredHeight: 320
                 radius: 20
                 color: "#cfd8cc"
+                Layout.alignment: Qt.AlignHCenter
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        cameraField.color = "green"
+                        // will open camera upon clicking
                     }
                 }
 
@@ -171,12 +181,12 @@ Page {
 
             }
 
-            // Upload Button
+            // choose from Gallary
 
             Button{
                 id:uploadButton
-                text: "Upload Photo"
-                icon.source: "qrc:/assets/home/upload-photo-68.png"
+                text: "Select from Gallery"
+                icon.source: "qrc:/assets/home/gallery-96.png"
                 icon.width: 30
                 icon.height: 30
                  Layout.alignment: Qt.AlignHCenter
