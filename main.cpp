@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     // Initialize resources
    // Q_INIT_RESOURCE(languages);
 
-    // Create instances
+    // instances
     Helper helper;
     InfarenceRunner infarenceRunner;
 
