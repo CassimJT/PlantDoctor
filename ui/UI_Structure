@@ -3,6 +3,9 @@ UI
 │   └── MainStackView.qml
 │
 ├── features
+        Auth
+│   │   ├── SignInScreen.qml
+│   │   └── SignUpScreen.qml
 │   ├── home
 │   │   ├── HomeScreen.qml
 │   │   └── HomePage.qml

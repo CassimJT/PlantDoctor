@@ -58,7 +58,8 @@ Page {
                 anchors.fill: parent
                 onClicked: {
                     // will open camera upon clicking
-                    mainLoader.item && mainLoader.item.mainStackView.push("CameraScreen.qml")
+                    Helper.requestCameraPeremision()
+                    mainStackView?.push("CameraScreen.qml")
                 }
             }
 

@@ -88,6 +88,8 @@ qt_add_qml_module(appPlantDoctor
         src/core/infarence/infarencerunner.cpp
         src/core/infarence/diseaseinfomanager.h
         src/core/infarence/diseaseinfomanager.cpp
+        src/core/synch/cloudsynch.h
+        src/core/synch/cloudsynch.cpp
 )
 
 # ─────────────────────────────────────────────────────────────
