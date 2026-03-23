@@ -232,6 +232,34 @@ Page {
                             onClicked: console.log("Continue tapped")
                         }
                     }
+                    Item { Layout.preferredHeight: 2 }
+
+                    // ── Create account ────────────────────────────────────────
+                    Row {
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: 4
+
+                        Text {
+                            text: "Don't have an account?"
+                            font.pixelSize: 13
+                            color: "#000000"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        Text {
+                            text: "Create account"
+                            font.pixelSize: 13
+                            font.bold: true
+                            color: "#5A9E6F"
+                            font.underline: true
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: console.log("Create account tapped")
+                            }
+                        }
+                    }
+
 
                     Item { Layout.preferredHeight: 8 }
                 }
