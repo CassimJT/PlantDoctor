@@ -170,42 +170,40 @@ Page {
                     }
 
                     // ── Email / Phone field ───────────────────────────────────
-                    ColumnLayout {
+                    Rectangle {
                         Layout.fillWidth: true
-                        spacing: 6
+                        height: 56
+                        radius: 12
+                        color: "#FAFAFA"
+                        border.color: emailField.activeFocus ? "#8FAF8F" : "#000000"
+                        border.width: emailField.activeFocus ? 1.5 : 1
+
+                        Behavior on border.color { ColorAnimation { duration: 150 } }
 
                         Text {
+                            id: emailLabel
                             text: "Email or phone number"
-                            font.pixelSize: 12
                             color: "#000000"
+                            font.pixelSize: 14
+                            anchors.verticalCenter: parent.verticalCenter
+                            x: 16
+                            visible: emailField.text.length === 0 && !emailField.activeFocus
                         }
 
-                        Rectangle {
-                            Layout.fillWidth: true
-                            height: 50
-                            radius: 12
-                            color: "#FAFAFA"
-                            border.color: emailField.activeFocus ? "#8FAF8F" : "#000000"
-                            border.width: emailField.activeFocus ? 1.5 : 1
-
-                            Behavior on border.color { ColorAnimation { duration: 150 } }
-
-                            TextField {
-                                id: emailField
-                                anchors {
-                                    fill: parent
-                                    leftMargin: 14; rightMargin: 14
-                                }
-                                placeholderText: ""
-                                color: "#000000"
-                                font.pixelSize: 14
-                                background: Item {}
-                                inputMethodHints: Qt.ImhEmailCharactersOnly
-                                verticalAlignment: TextInput.AlignVCenter
+                        TextField {
+                            id: emailField
+                            anchors {
+                                fill: parent
+                                leftMargin: 16; rightMargin: 14
                             }
+                            placeholderText: ""
+                            color: "#000000"
+                            font.pixelSize: 14
+                            background: Item {}
+                            inputMethodHints: Qt.ImhEmailCharactersOnly
+                            verticalAlignment: TextInput.AlignVCenter
                         }
                     }
-
                     Item { Layout.preferredHeight: 4 }
 
                     // ── Continue button ───────────────────────────────────────
