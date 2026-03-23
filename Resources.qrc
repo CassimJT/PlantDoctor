@@ -22,5 +22,6 @@
         <file>assets/home/gallery-96.png</file>
         <file>assets/languages/diseases_ny.json</file>
         <file>assets/languages/diseases_en.json</file>
+        <file>assets/home/icons8-switch-camera-100.png</file>
     </qresource>
 </RCC>
