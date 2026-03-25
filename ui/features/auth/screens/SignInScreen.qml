@@ -17,7 +17,7 @@ Page {
             width: parent.width
             spacing: 0
 
-            Item { Layout.preferredHeight: 72 }
+            Item { Layout.preferredHeight: 100 }
 
             // App Logo
             Image {
@@ -36,11 +36,12 @@ Page {
                 text: "Sign in to PlantDoctor"
                 font.family: "Georgia"
                 font.pixelSize: 26
+                font.bold: true
                 color: "#1A2E1F"
                 font.letterSpacing: 0.3
             }
 
-            Item { Layout.preferredHeight: 32 }
+            Item { Layout.preferredHeight: 80 }
 
             // ── Card ─────────────────────────────────────────────────────────
             Rectangle {
@@ -52,6 +53,7 @@ Page {
                 color: "#FFFFFF"
                 border.color: "#000000"
                 border.width: 1
+
 
                 ColumnLayout {
                     id: cardColumn
