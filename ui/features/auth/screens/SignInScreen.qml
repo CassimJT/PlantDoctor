@@ -3,7 +3,6 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Page {
-    objectName: "SignIn"
     width: 360
     height: 800
     background: Rectangle { color: "#e8efe6" }
@@ -19,6 +18,17 @@ Page {
             spacing: 0
 
             Item { Layout.preferredHeight: 72 }
+
+            // App Logo
+            Image {
+                id: appLogo
+                source: "qrc:/assets/home/logo.png"
+                fillMode: Image.PreserveAspectFit
+
+                Layout.preferredWidth: 40
+                Layout.preferredHeight: 40
+                Layout.alignment: Qt.AlignHCenter
+            }
 
             // ── Heading ─────────────────────────────────────────────────────
             Text {
