@@ -9,7 +9,7 @@ Item {
     signal switchClicked()
     signal themeChanged()
     signal menuClicked()
-    property real h_height: 90
+    property real h_height: 100
     Rectangle {
         id: header
         width: parent.width
@@ -21,7 +21,7 @@ Item {
                 right: parent.right
                 left: parent.left
                 bottom: parent.bottom
-                bottomMargin: 2
+                bottomMargin: 6
             }
             //Material.elevation: 7
             RowLayout{
@@ -56,6 +56,7 @@ Item {
 
                     font.pixelSize: 14
                     font.weight: Font.Medium
+                    font.bold: true
                     Layout.leftMargin: 30
                 }
                 Item {

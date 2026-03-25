@@ -265,7 +265,9 @@ Page {
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: console.log("Create account tapped")
+                                onClicked: {
+                                    mainStackView.replace("SignUpScreen.qml")
+                                }
                             }
                         }
                     }
