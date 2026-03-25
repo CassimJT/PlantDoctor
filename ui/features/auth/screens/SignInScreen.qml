@@ -41,7 +41,7 @@ Page {
                 font.letterSpacing: 0.3
             }
 
-            Item { Layout.preferredHeight: 80 }
+            Item { Layout.preferredHeight: 70 }
 
             // ── Card ─────────────────────────────────────────────────────────
             Rectangle {
