@@ -37,7 +37,7 @@ Page {
     Item {
         anchors.fill: parent
         visible: !showPreview
-
+        anchors.topMargin: 20
         VideoOutput {
             id: videoOutput
             anchors.fill: parent
