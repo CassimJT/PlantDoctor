@@ -5,6 +5,7 @@
 #include "src/core/utills/helper.h"
 #include "src/core/infarence/infarencerunner.h"
 #include "src/core/infarence/diseaseinfomanager.h"
+#include "src/core/rtsp/rtsvideooutput.h"
 
 int main(int argc, char *argv[])
 {
@@ -37,7 +38,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("Helper", &helper);
     engine.rootContext()->setContextProperty("InfarenceRunner", &infarenceRunner);
     engine.rootContext()->setContextProperty("CurrentLanguage", appLanguage);
-
+    qmlRegisterType<RTSVideoOutput>("RTSVideoOutput",1,0,"RTSVideoOutput");
     // Simple language names for UI
     QVariantMap languageNames;
     languageNames["en"] = "English";

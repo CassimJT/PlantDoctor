@@ -9,7 +9,7 @@ Item {
     signal switchClicked()
     signal themeChanged()
     signal menuClicked()
-    property real h_height: 100
+    property real h_height: 90
     Rectangle {
         id: header
         width: parent.width
