@@ -85,36 +85,71 @@ Page {
                     }
 
                     Rectangle {
-                                            Layout.fillWidth: true
-                                            height: 56
-                                            radius: 12
-                                            color: "#FAFAFA"
-                                            border.color: districtField.activeFocus ? "#8FAF8F" : "#000000"
-                                            border.width: districtField.activeFocus ? 1.5 : 1
+                        Layout.fillWidth: true
+                        height: 56
+                        radius: 12
+                        color: "#FAFAFA"
+                        border.color: districtField.activeFocus ? "#8FAF8F" : "#000000"
+                        border.width: districtField.activeFocus ? 1.5 : 1
 
-                                            Behavior on border.color { ColorAnimation { duration: 150 } }
+                        Behavior on border.color { ColorAnimation { duration: 150 } }
 
-                                            Text {
-                                                text: "District"
-                                                color: "#000000"
-                                                font.pixelSize: 14
-                                                anchors.centerIn: parent
-                                                visible: districtField.text.length === 0 && !districtField.activeFocus
-                                            }
+                        Text {
+                            text: "District"
+                            color: "#000000"
+                            font.pixelSize: 14
+                            anchors.centerIn: parent
+                            visible: districtField.text.length === 0 && !districtField.activeFocus
+                        }
 
-                                            TextField {
-                                                id: districtField
-                                                anchors {
-                                                    fill: parent
-                                                    leftMargin: 16; rightMargin: 14
-                                                }
-                                                placeholderText: ""
-                                                color: "#000000"
-                                                font.pixelSize: 14
-                                                background: Item {}
-                                                verticalAlignment: TextInput.AlignVCenter
-                                            }
-                                        }
+                        TextField {
+                            id: districtField
+                            anchors {
+                                fill: parent
+                                leftMargin: 16; rightMargin: 14
+                            }
+                            placeholderText: ""
+                            color: "#000000"
+                            font.pixelSize: 14
+                            background: Item {}
+                            verticalAlignment: TextInput.AlignVCenter
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 56
+                        radius: 12
+                        color: "#FAFAFA"
+                        border.color: villageField.activeFocus ? "#8FAF8F" : "#000000"
+                        border.width: villageField.activeFocus ? 1.5 : 1
+
+                        Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                        Text {
+                            text: "Village"
+                            color: "#000000"
+                            font.pixelSize: 14
+                            anchors.centerIn: parent
+                            visible: villageField.text.length === 0 && !villageField.activeFocus
+                        }
+
+                        TextField {
+                            id: villageField
+                            anchors {
+                                fill: parent
+                                leftMargin: 16; rightMargin: 14
+                            }
+                            placeholderText: ""
+                            color: "#000000"
+                            font.pixelSize: 14
+                            background: Item {}
+                            verticalAlignment: TextInput.AlignVCenter
+                        }
+                    }
+
+                    Item { Layout.preferredHeight: 4 }
+
 
                 }
             }
