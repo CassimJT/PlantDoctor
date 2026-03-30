@@ -90,22 +90,22 @@ Page {
                         height: 56
                         radius: 12
                         color: "#FAFAFA"
-                        border.color: districtField.activeFocus ? "#8FAF8F" : "#000000"
-                        border.width: districtField.activeFocus ? 1.5 : 1
+                        border.color: phoneNumberField.activeFocus ? "#8FAF8F" : "#000000"
+                        border.width: phoneNumberField.activeFocus ? 1.5 : 1
 
                         Behavior on border.color { ColorAnimation { duration: 150 } }
 
                         Text {
-                            text: "District"
+                            text: "Phone Number"
                             color: "#000000"
                             font.pixelSize: 14
                             anchors.verticalCenter: parent.verticalCenter
                             x: 16
-                            visible: districtField.text.length === 0 && !districtField.activeFocus
+                            visible: phoneNumberField.text.length === 0 && !phoneNumberField.activeFocus
                         }
 
                         TextField {
-                            id: districtField
+                            id: phoneNumberField
                             anchors {
                                 fill: parent
                                 leftMargin: 16; rightMargin: 14
@@ -123,22 +123,22 @@ Page {
                         height: 56
                         radius: 12
                         color: "#FAFAFA"
-                        border.color: villageField.activeFocus ? "#8FAF8F" : "#000000"
-                        border.width: villageField.activeFocus ? 1.5 : 1
+                        border.color: districtField.activeFocus ? "#8FAF8F" : "#000000"
+                        border.width: districtField.activeFocus ? 1.5 : 1
 
                         Behavior on border.color { ColorAnimation { duration: 150 } }
 
                         Text {
-                            text: "Village"
+                            text: "District"
                             color: "#000000"
                             font.pixelSize: 14
                             anchors.verticalCenter: parent.verticalCenter
                             x: 16
-                            visible: villageField.text.length === 0 && !villageField.activeFocus
+                            visible: districtField.text.length === 0 && !districtField.activeFocus
                         }
 
                         TextField {
-                            id: villageField
+                            id: districtField
                             anchors {
                                 fill: parent
                                 leftMargin: 16; rightMargin: 14
