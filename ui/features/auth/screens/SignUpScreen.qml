@@ -23,7 +23,7 @@ Page {
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 72
-                text: "Create Account"
+                text: "Sign Up To PlantDoctor"
                 font.family: "Georgia"
                 font.pixelSize: 26
                 color: "#1A2E1F"
@@ -150,9 +150,71 @@ Page {
 
                     Item { Layout.preferredHeight: 4 }
 
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 52
+                        radius: 14
+                        color: signUpMA.pressed ? "#7A9E7E" : "#8FAF8F"
 
-                }
-            }
-        }
-    }
-}
+                        Behavior on color { ColorAnimation { duration: 120 } }
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Sign Up"
+                            font.family: "Georgia"
+                            font.pixelSize: 16
+                            color: "#FFFFFF"
+                            font.letterSpacing: 0.4
+                        }
+
+                        MouseArea {
+                            id: signUpMA
+                            anchors.fill: parent
+                            onClicked: {
+                                // navigate to homepage
+                                // stackView.push("../home/HomePage.qml")
+                                console.log("Sign up tapped")
+                            }
+                        }
+                    }
+                    Row {
+                                            Layout.alignment: Qt.AlignHCenter
+                                            spacing: 4
+
+                                            Text {
+                                                text: "Already have an account?"
+                                                font.pixelSize: 13
+                                                color: "#000000"
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                            Text {
+                                                text: "Sign in"
+                                                font.pixelSize: 13
+                                                font.bold: true
+                                                color: "#5A9E6F"
+                                                font.underline: true
+                                                anchors.verticalCenter: parent.verticalCenter
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: {
+                                                        // stackView.pop()
+                                                        console.log("Sign in tapped")
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        Item { Layout.preferredHeight: 8 }
+                                    }
+                                }
+
+                                Item { Layout.preferredHeight: 40 }
+                            }
+                        }
+                    }
+
+
+
+
+
