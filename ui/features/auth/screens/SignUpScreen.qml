@@ -18,7 +18,7 @@ Page {
             width: parent.width
             spacing: 0
 
-            Item { Layout.preferredHeight: 72 }
+            Item { Layout.preferredHeight: 85 }
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -66,7 +66,8 @@ Page {
                             text: "Full Name"
                             color: "#000000"
                             font.pixelSize: 14
-                            anchors.centerIn: parent
+                            anchors.verticalCenter: parent.verticalCenter
+                            x: 16
                             visible: nameField.text.length === 0 && !nameField.activeFocus
                         }
 
@@ -98,7 +99,8 @@ Page {
                             text: "District"
                             color: "#000000"
                             font.pixelSize: 14
-                            anchors.centerIn: parent
+                            anchors.verticalCenter: parent.verticalCenter
+                            x: 16
                             visible: districtField.text.length === 0 && !districtField.activeFocus
                         }
 
@@ -130,7 +132,8 @@ Page {
                             text: "Village"
                             color: "#000000"
                             font.pixelSize: 14
-                            anchors.centerIn: parent
+                            anchors.verticalCenter: parent.verticalCenter
+                            x: 16
                             visible: villageField.text.length === 0 && !villageField.activeFocus
                         }
 
