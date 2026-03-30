@@ -84,6 +84,38 @@ Page {
                         }
                     }
 
+                    Rectangle {
+                                            Layout.fillWidth: true
+                                            height: 56
+                                            radius: 12
+                                            color: "#FAFAFA"
+                                            border.color: districtField.activeFocus ? "#8FAF8F" : "#000000"
+                                            border.width: districtField.activeFocus ? 1.5 : 1
+
+                                            Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                                            Text {
+                                                text: "District"
+                                                color: "#000000"
+                                                font.pixelSize: 14
+                                                anchors.centerIn: parent
+                                                visible: districtField.text.length === 0 && !districtField.activeFocus
+                                            }
+
+                                            TextField {
+                                                id: districtField
+                                                anchors {
+                                                    fill: parent
+                                                    leftMargin: 16; rightMargin: 14
+                                                }
+                                                placeholderText: ""
+                                                color: "#000000"
+                                                font.pixelSize: 14
+                                                background: Item {}
+                                                verticalAlignment: TextInput.AlignVCenter
+                                            }
+                                        }
+
                 }
             }
         }
