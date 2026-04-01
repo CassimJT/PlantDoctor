@@ -268,12 +268,7 @@ Page {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-<<<<<<< HEAD
-                                    mainStackView.replace("SignUpScreen.qml")
-=======
-
                                     mainStackView?.push("SignUpScreen.qml")
->>>>>>> liz
                                 }
                             }
                         }
