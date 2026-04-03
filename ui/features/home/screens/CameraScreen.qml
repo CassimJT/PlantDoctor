@@ -6,7 +6,7 @@ import QtMultimedia
 Page {
     id: cameraScreen
 
-    background: Rectangle { color: "#0a0f0a" }
+    background: Rectangle { color: "#edf2e0" }
 
     property string capturedImagePath: ""
     property bool showPreview: false
@@ -63,50 +63,6 @@ Page {
             }
         }
 
-        // Top bar
-        RowLayout {
-            anchors {
-                top: parent.top; left: parent.left; right: parent.right
-                margins: 20; topMargin: 52
-            }
-
-            Rectangle {
-                width: 42; height: 42; radius: 21
-                color: "#33ffffff"; border.color: "#55ffffff"; border.width: 1
-                Text {
-                    anchors.centerIn: parent
-                    text: "X"; color: "white"; font.pointSize: 15; font.bold: true
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        camera.active = false
-                        mainLoader.item.mainStackView.pop()
-                    }
-                }
-            }
-
-            Item { Layout.fillWidth: true }
-
-            Rectangle {
-                height: 32; width: chipLabel.implicitWidth + 24
-                radius: 16; color: "#33ffffff"; border.color: "#44ffffff"; border.width: 1
-                Text {
-                    id: chipLabel
-                    anchors.centerIn: parent
-                    text: "Plant Scanner"; color: "white"
-                    font.pointSize: 11; font.letterSpacing: 1.2
-                }
-            }
-
-            Item { Layout.fillWidth: true }
-
-            Rectangle {
-                width: 42; height: 42; radius: 21
-                color: "#33ffffff"; border.color: "#55ffffff"; border.width: 1
-                Text { anchors.centerIn: parent; text: "⚡"; font.pointSize: 15 }
-            }
-        }
 
         // Scan frame
         Item {
@@ -148,33 +104,7 @@ Page {
                 }
             }
 
-            Rectangle {
-                id: scanLine
-                width: parent.width - 4; height: 2; radius: 1
-                anchors.horizontalCenter: parent.horizontalCenter
-                y: 4
-                gradient: Gradient {
-                    orientation: Gradient.Horizontal
-                    GradientStop { position: 0.0; color: "transparent" }
-                    GradientStop { position: 0.3; color: "#885dde7a" }
-                    GradientStop { position: 0.5; color: "#ff5dde7a" }
-                    GradientStop { position: 0.7; color: "#885dde7a" }
-                    GradientStop { position: 1.0; color: "transparent" }
-                }
-                SequentialAnimation {
-                    running: true; loops: Animation.Infinite
-                    NumberAnimation {
-                        target: scanLine; property: "y"
-                        from: 4; to: scanFrame.height - 4
-                        duration: 2200; easing.type: Easing.InOutSine
-                    }
-                    NumberAnimation {
-                        target: scanLine; property: "y"
-                        from: scanFrame.height - 4; to: 4
-                        duration: 2200; easing.type: Easing.InOutSine
-                    }
-                }
-            }
+
         }
 
         Text {
@@ -266,10 +196,10 @@ Page {
                 from: 0; to: 1; duration: 350; easing.type: Easing.OutCubic
             }
 
-            // Dark background instead of full-bleed photo
+            //  background
             Rectangle {
                 anchors.fill: parent
-                color: "#e8efe6"
+                color: "#edf2e0"
             }
 
 

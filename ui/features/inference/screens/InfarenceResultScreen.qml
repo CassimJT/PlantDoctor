@@ -11,7 +11,7 @@ Page {
     property string plantName:    "Spinach Plant"
     property string diseaseName:  "Downy Mildew"
 
-    property real   riskLevel:    0.22   // 0.0 = Low, 1.0 = High
+    property real   riskLevel:    0.72   // 0.0 = Low, 1.0 = High
     property string description:  "Downy mildew is a common and destructive fungal disease affecting spinach. Symptoms: Yellowish spots appear on the upper leaf surface. A purplish-gray mold develops on the underside of leaves."
     property string noteText:     "Early detection and prompt action are crucial for managing downy mildew. If you suspect downy mildew in your spinach, consult a local agricultural extension agent for specific recommendations."
     property var treatments: [
@@ -20,7 +20,7 @@ Page {
         { title: "Crop Rotation",       body: "Avoid planting spinach in the same location year after year to break the disease cycle." }
     ]
 
-    background: Rectangle { color: "#e8efe6" }
+    background: Rectangle { color: "#edf2e0" }
 
     // Fade-in on load
     opacity: 0
