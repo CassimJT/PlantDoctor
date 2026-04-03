@@ -15,9 +15,9 @@ Page {
         spacing: 50
         width: parent.width
 
-
+        //firts contaneir
         ColumnLayout{
-            //firts contaneir
+
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: parent.width
 
@@ -54,14 +54,9 @@ Page {
 
         }
 
-        /*
-        Item {
-            Layout.preferredWidth: 10
-            Layout.preferredHeight: 50
-        }
-        */
+       //second contaneir
         ColumnLayout{
-            //second contaneir
+
             Layout.alignment: Qt.AlignHCenter
 
             // Camera Preview Area
@@ -90,7 +85,7 @@ Page {
                     fillMode: Image.PreserveAspectFit
                 }
 
-                // Improved scan line matching CameraScreen
+                // scan line matching CameraScreen
                 Rectangle {
                     id: scanLine
                     width: parent.width - 40
@@ -187,32 +182,71 @@ Page {
             }
         }
 
-       ColumnLayout{
-           //last cont
-           Layout.alignment: Qt.AlignHCenter
+            //Gallery button
+        ColumnLayout {
+            Layout.alignment: Qt.AlignHCenter
 
-           Button {
-               id: uploadButton
-               text: "Gallery"
+            Rectangle {
+                width: 220
+                height: 60
+                radius: 30
+                Layout.alignment: Qt.AlignHCenter
 
-               icon.source: "qrc:/assets/home/gallery-96.png"
-               icon.width: 30
-               icon.height: 30
+                gradient: Gradient {
+                    orientation: Gradient.Horizontal
+                    GradientStop { position: 0.0; color: galleryArea.containsPress ? "#2a9e48" : "#34c45a" }
+                    GradientStop { position: 1.0; color: galleryArea.containsPress ? "#3dbf60" : "#5dde7a" }
+                }
 
-               Layout.alignment: Qt.AlignHCenter
-               font.pointSize: 18
-               font.bold: true
-               background: Rectangle{
-                   anchors.fill: parent
-                   color: "#21b054"
-                   radius: 10
-               }
-           }
+                Rectangle {
+                    anchors { top: parent.top; left: parent.left; right: parent.right }
+                    height: parent.height / 2
+                    radius: parent.radius
+                    color: "#1affffff"
+                }
 
-       }
+                Rectangle {
+                    anchors.fill: parent
+                    radius: parent.radius
+                    color: "transparent"
+                    border.color: "#445dde7a"
+                    border.width: 1
+                }
+
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 10
+
+                    Image {
+                        source: "qrc:/assets/home/gallery-96.png"
+                        width: 24; height: 24
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Text {
+                        text: "Select from Gallery"
+                        color: "white"
+                        font.pointSize: 14
+                        font.bold: true
+                        font.letterSpacing: 0.6
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                scale: galleryArea.containsPress ? 0.97 : 1.0
+                Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutQuad } }
+
+                MouseArea {
+                    id: galleryArea
+                    anchors.fill: parent
+                    onClicked: {
+                        console.log("to phone gallery")
+                    }
+                }
+            }
+        }
 
 
-        // Select from Gallery button
+
 
     }
 }

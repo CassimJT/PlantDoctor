@@ -342,6 +342,7 @@ Page {
             spacing: 14
 
             // Re-generate
+            // Re-generate
             Rectangle {
                 Layout.fillWidth: true; height: 52
                 radius: 26
@@ -363,10 +364,14 @@ Page {
                     id: regenArea
                     anchors.fill: parent
                     onClicked: {
-                    mainLoader.item.mainStackView.pop()
-                        //have to find a way to open camera again
+                        // Pop both InferenceResultScreen and CameraScreen off the stack
+                        // then push a fresh CameraScreen so camera restarts cleanly
+                        mainLoader.item.mainStackView.pop()  // back to CameraScreen
+                        mainLoader.item.mainStackView.pop()  // back to HomeScreen
+                        mainLoader.item.mainStackView.push(
+                            "qrc:/qt/qml/PlantDoctor/ui/features/home/screens/CameraScreen.qml"
+                        )
                     }
-
                 }
             }
 
