@@ -70,6 +70,7 @@ qt_add_qml_module(appPlantDoctor
         ui/features/home/screens/CameraScreen.qml
         ui/features/auth/screens/SignInScreen.qml
         ui/features/auth/screens/SignUpScreen.qml
+        ui/components/DHTMeter.qml
     SOURCES
         src/core/mqtt/mqttclient.cpp
         src/core/mqtt/mqttclient.h
