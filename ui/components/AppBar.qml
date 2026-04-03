@@ -107,7 +107,7 @@ Item {
                             icon.source: "qrc:/assets/appbar/settings.svg"
                             text: qsTr("Settings")
                             onClicked: {
-                                mainLoader.item && mainLoader.item.mainStackView.push("../features/sensors/screens/SettingsScreen.qml")
+                                mainLoader.item && mainLoader.item.mainStackView.push("../features/settings/Settings.qml")
 
                             }
                         }

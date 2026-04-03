@@ -24,7 +24,6 @@ ApplicationWindow {
     Material.primary : "#edf2e0"
     Material.accent : "#4CAF50"
     Material.background: "#edf2e0"
-
     //-------------- Header ---------------------------------------------------------
     header: AppBar {
         id: appHeader

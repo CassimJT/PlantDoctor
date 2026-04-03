@@ -25,5 +25,7 @@
         <file>assets/home/icons8-switch-camera-100.png</file>
         <file>assets/home/icons8-retake-100.png</file>
         <file>assets/home/icons8-analyse-60.png</file>
+        <file>assets/settings/PND.svg</file>
+        <file>assets/settings/PND.png</file>
     </qresource>
 </RCC>

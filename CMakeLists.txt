@@ -53,7 +53,7 @@ qt_add_qml_module(appPlantDoctor
         ui/features/inference/delegate/HistoryDelegate.qml
         ui/features/sensors/model/SensorSelectionModel.qml
         ui/features/sensors/delegate/SensorSelectionDelegate.qml
-        ui/features/settings/SystemSettings.qml
+        ui/features/settings/Settings.qml
         ui/components/ImagePreview.qml
         ui/components/CircularProgressBar.qml
         ui/components/AvataDrawerTools.qml
@@ -63,7 +63,6 @@ qt_add_qml_module(appPlantDoctor
         ui/utils/Utils.js
         ui/features/inference/screens/InfarenceResultScreen.qml
         ui/features/inference/screens/InfarenceHistoryScreen.qml
-        ui/features/sensors/screens/SettingsScreen.qml
         ui/features/sensors/screens/SensorDashboard.qml
         ui/features/sensors/screens/LiveMonitorScreen.qml
         ui/features/sensors/screens/Hotlines.qml
@@ -71,6 +70,11 @@ qt_add_qml_module(appPlantDoctor
         ui/features/auth/screens/SignInScreen.qml
         ui/features/auth/screens/SignUpScreen.qml
         ui/components/DHTMeter.qml
+        ui/features/devices/DevicesPage.qml
+        ui/features/devices/componets/DeviceManu.qml
+        ui/features/devices/delegate/DeviceDelegate.qml
+        ui/features/settings/screens/SystemSettings.qml
+
     SOURCES
         src/core/mqtt/mqttclient.cpp
         src/core/mqtt/mqttclient.h
@@ -95,6 +99,8 @@ qt_add_qml_module(appPlantDoctor
         src/core/rtsp/rtsvideoworker.cpp
         src/core/rtsp/rtsvideooutput.h
         src/core/rtsp/rtsvideooutput.cpp
+
+
 
 )
 
