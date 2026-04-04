@@ -234,7 +234,7 @@ if(ANDROID)
     file(MAKE_DIRECTORY "${ANDROID_ASSETS_DIR}/languages")
 
     # ─────────────────────────────────────────────────────────
-    # 1. Model file
+    # 1. Plant Disease Model file (original)
     # ─────────────────────────────────────────────────────────
     set(POSSIBLE_MODEL_DIRS
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/model"
@@ -246,7 +246,7 @@ if(ANDROID)
     foreach(dir IN LISTS POSSIBLE_MODEL_DIRS)
         set(model_path "${dir}/plant_disease_model.pte")
         if(EXISTS "${model_path}")
-            message(STATUS "Found model at: ${model_path}")
+            message(STATUS "Found plant disease model at: ${model_path}")
 
             # Copy to source assets
             file(COPY "${model_path}" DESTINATION "${ANDROID_ASSETS_DIR}/model")
@@ -258,7 +258,7 @@ if(ANDROID)
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${model_path}"
                     "${ANDROID_BUILD_ASSETS_DIR}/model/plant_disease_model.pte"
-                COMMENT ">>> Copying model to build assets"
+                COMMENT ">>> Copying plant disease model to build assets"
             )
             set(MODEL_FOUND TRUE)
             break()
@@ -266,11 +266,47 @@ if(ANDROID)
     endforeach()
 
     if(NOT MODEL_FOUND)
-        message(WARNING "Model file not found. Tried: ${POSSIBLE_MODEL_DIRS}")
+        message(WARNING "Plant disease model file not found. Tried: ${POSSIBLE_MODEL_DIRS}")
     endif()
 
     # ─────────────────────────────────────────────────────────
-    # 2. Language files
+    # 2. Pest Detection Model file (new)
+    # ─────────────────────────────────────────────────────────
+    set(POSSIBLE_PEST_MODEL_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/model"
+        "${WORKSPACE_BASE_DIR}/assets/model"
+        "${CMAKE_CURRENT_SOURCE_DIR}/model"
+        "${CMAKE_CURRENT_SOURCE_DIR}/pest_detection"
+    )
+
+    set(PEST_MODEL_FOUND FALSE)
+    foreach(dir IN LISTS POSSIBLE_PEST_MODEL_DIRS)
+        set(pest_model_path "${dir}/pest_detection.pte")
+        if(EXISTS "${pest_model_path}")
+            message(STATUS "Found pest detection model at: ${pest_model_path}")
+
+            # Copy to source assets
+            file(COPY "${pest_model_path}" DESTINATION "${ANDROID_ASSETS_DIR}/model")
+
+            # Setup post-build copy
+            add_custom_command(
+                TARGET appPlantDoctor POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${pest_model_path}"
+                    "${ANDROID_BUILD_ASSETS_DIR}/model/pest_detection.pte"
+                COMMENT ">>> Copying pest detection model to build assets"
+            )
+            set(PEST_MODEL_FOUND TRUE)
+            break()
+        endif()
+    endforeach()
+
+    if(NOT PEST_MODEL_FOUND)
+        message(WARNING "Pest detection model file not found. Tried: ${POSSIBLE_PEST_MODEL_DIRS}")
+    endif()
+
+    # ─────────────────────────────────────────────────────────
+    # 3. Language files
     # ─────────────────────────────────────────────────────────
     set(POSSIBLE_LANG_DIRS
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/languages"
@@ -324,9 +360,15 @@ if(ANDROID)
     # ─────────────────────────────────────────────────────────
     message(STATUS ">>> Android assets setup complete <<<")
     if(MODEL_FOUND)
-        message(STATUS " Model: plant_disease_model.pte")
+        message(STATUS " Plant Disease Model: plant_disease_model.pte")
     else()
-        message(STATUS " Model: NOT FOUND")
+        message(STATUS " Plant Disease Model: NOT FOUND")
+    endif()
+
+    if(PEST_MODEL_FOUND)
+        message(STATUS " Pest Detection Model: pest_detection.onnx")
+    else()
+        message(STATUS " Pest Detection Model: NOT FOUND")
     endif()
 
     if(LANG_FILES_FOUND)
@@ -456,6 +498,7 @@ set_target_properties(appPlantDoctor PROPERTIES
     MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}"
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
+    QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android"
 )
 
 # ─────────────────────────────────────────────────────────────

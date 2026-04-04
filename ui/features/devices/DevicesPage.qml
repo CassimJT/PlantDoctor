@@ -33,6 +33,40 @@ Page {
                 color: "#aaa"
                 anchors.horizontalCenter: parent.horizontalCenter
             }
+
+            Button {
+                id: centerButton
+                visible: DeviceModel && DeviceModel.count === 0 &&
+                         DeviceConfigurator && !DeviceConfigurator.isScanning
+
+                text: {
+                    if (!DeviceConfigurator) return "Loading..."
+                    if (!DeviceConfigurator.isBrokerConnected)
+                        return "Connect to Broker"
+                    else if (DeviceConfigurator.isScanning)
+                        return "Scanning..."
+                    else
+                        return "Scan for Devices"
+                }
+
+                enabled: DeviceConfigurator &&
+                         !DeviceConfigurator.isScanning &&
+                         DeviceConfigurator.isBrokerConnected
+
+                onClicked: {
+                    if (!DeviceConfigurator) return
+                    if (!DeviceConfigurator.isBrokerConnected) {
+                        DeviceConfigurator.connectToBroker()
+                    } else {
+                        DeviceConfigurator.scanForDevices(10)
+                    }
+                }
+
+                width: 200
+                height: 50
+                anchors.bottomMargin: -40
+
+            }
         }
     }
 
@@ -50,49 +84,25 @@ Page {
         visible: DeviceModel && DeviceModel.count > 0
     }
 
-    Button {
-        id: centerButton
-        anchors.centerIn: parent
-        visible: DeviceModel && DeviceModel.count === 0 &&
-                 DeviceConfigurator && !DeviceConfigurator.isScanning
-
-        text: {
-            if (!DeviceConfigurator) return "Loading..."
-            if (!DeviceConfigurator.isBrokerConnected)
-                return "Connect to Broker"
-            else if (DeviceConfigurator.isScanning)
-                return "Scanning..."
-            else
-                return "Scan for Devices"
-        }
-
-        enabled: DeviceConfigurator &&
-                 !DeviceConfigurator.isScanning &&
-                 DeviceConfigurator.isBrokerConnected
-
-        onClicked: {
-            if (!DeviceConfigurator) return
-            if (!DeviceConfigurator.isBrokerConnected) {
-                DeviceConfigurator.connectToBroker()
-            } else {
-                DeviceConfigurator.scanForDevices(10)
-            }
-        }
-
-        width: 200
-        height: 50
-        anchors.bottomMargin: -40
-
-    }
-
-    // Loading indicator while scanning
+    // Busy indicator when not connected
     BusyIndicator {
-        id: scanningIndicator
+          id: scanningIndicator
         anchors.centerIn: parent
+        width: 80
+        height: 80
         running: DeviceConfigurator &&
                  DeviceConfigurator.isScanning &&
                  DeviceModel && DeviceModel.count === 0
         visible: running
+
+        Text {
+            text: "Connecting to PND Device..."
+            color: "#333"
+            font.pixelSize: 14
+            anchors.top: parent.bottom
+            anchors.topMargin: 10
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
     }
 
     // Auto-scan when broker connects

@@ -3,39 +3,71 @@
 
 #include <QObject>
 #include <QImage>
-#include <QMutex>
-#include <QQueue>
-#include <QAtomicInteger>
+#include <QString>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QThreadPool>
+#include <QQueue>
+#include <QMutex>
+#include <QAtomicInt>
 #include <QElapsedTimer>
+#include <QThreadPool>
+#include <QRunnable>
+#include <functional>
 #include <opencv2/opencv.hpp>
+// Executorch includes
+#include <executorch/extension/module/module.h>
+#include <executorch/extension/tensor/tensor.h>
+using executorch::extension::TensorPtr;
+
+// Detection Task for async inference using ExecuTorch
+class DetectionTask : public QRunnable
+{
+public:
+    DetectionTask(std::shared_ptr<executorch::extension::Module> module,
+                  cv::Mat frame, cv::Size originalShape,
+                  const QStringList& classNames, float confThreshold = 0.20f);
+    ~DetectionTask();
+
+    void run() override;
+
+    using Callback = std::function<void(const QList<QMap<QString, QVariant>>&, const cv::Size&)>;
+    void setCallback(Callback callback) { m_callback = callback; }
+
+private:
+    std::shared_ptr<executorch::extension::Module> m_module;
+    cv::Mat m_frame;
+    cv::Size m_originalShape;
+    QStringList m_classNames;
+    float m_confThreshold;
+    float m_nmsThreshold;
+    int m_inputSize;
+    Callback m_callback;
+};
 
 class RTSVideoWorker : public QObject
 {
     Q_OBJECT
+
 public:
     explicit RTSVideoWorker(QObject *parent = nullptr);
-    ~RTSVideoWorker() override;
-
-    // Configuration methods
-    void setProcessingEnabled(bool enabled);
-    void setTargetSize(int width, int height);
-    void setOverlayText(const QString &text);
-    void setOverlayEnabled(bool enabled);
+    ~RTSVideoWorker();
 
 public slots:
     void start(const QString &url);
     void stop();
+    void setProcessingEnabled(bool enabled);
+    void setOverlayText(const QString &text);
+    void setDetectionEnabled(bool enabled);
+    void loadModel();
 
 signals:
     void frameReady(const QImage &frame);
     void error(const QString &message);
-    void started();
-    void stopped();
-    void fpsUpdated(double fps);
     void detectionResult(const QString &result);
+    void fpsUpdated(double fps);
+    void connectionStatusChanged(bool connected);
+    void modelloaded();
+    void modelLoadingFailed(const QString &error);
 
 private slots:
     void onData();
@@ -44,59 +76,64 @@ private slots:
 private:
     void parseStreamData();
     void decodeLoop();
-    void clearQueue();
-
-    // Image processing pipeline with memory optimization
     QImage processFrame(const cv::Mat &rawFrame);
     void applyOverlay(cv::Mat &frame);
-    void runDetectionModels(cv::Mat &frame);
-    void drawDetectionResults(cv::Mat &frame);
-
-    // FPS calculation
     void updateFPS();
+    void runDetection(cv::Mat &frame);
+    void drawDetections(cv::Mat &frame);
+    void detectionCallback(const QList<QMap<QString, QVariant>>& detections, const cv::Size& originalShape);
+    TensorPtr preprocess(const cv::Mat &img);
+    QString prepareModelFile();  // Same as InfarenceRunner
 
+    // Network
+    QNetworkAccessManager *m_nam;
+    QNetworkReply *m_reply;
     QString m_url;
     QByteArray m_buffer;
-    QAtomicInt m_running{0};
+    QMutex m_bufferMutex;
 
-    // Optimized queue with memory management
+    // Decoding
     QQueue<QByteArray> m_jpegQueue;
     QMutex m_queueMutex;
-    QAtomicInt m_decoderRunning{0};
+    QAtomicInt m_running;
+    QAtomicInt m_decoderRunning;
 
-    QNetworkAccessManager *m_nam = nullptr;
-    QNetworkReply *m_reply = nullptr;
+    // Processing
+    bool m_processingEnabled;
+    QString m_overlayText;
+    cv::Mat m_latestFrame;
+    QMutex m_frameMutex;
 
-    // Processing configuration
-    struct ProcessingConfig {
-        bool enabled = true;
-        int targetWidth = 640;
-        int targetHeight = 480;
-        bool overlayEnabled = true;
-        QString overlayText = "ESP32-CAM";
-        bool detectionEnabled = false;
-        int detectionInterval = 5;
-    } m_config;
-
-    // Performance monitoring
+    // FPS
+    int m_frameCount;
     QElapsedTimer m_fpsTimer;
-    int m_frameCount = 0;
-    double m_currentFps = 0.0;
-    int m_detectionCounter = 0;
+    double m_currentFps;
 
-    // Detection results
-    struct DetectionResults {
-        QStringList faces;
-        QList<cv::Rect> faceRects;
-        QStringList objects;
-        bool hasQRCode = false;
-        QString qrCodeData;
-    } m_lastDetection;
+    // ExecuTorch Model (same as InfarenceRunner)
+    std::shared_ptr<executorch::extension::Module> m_module;
+    bool m_isModelLoaded;
+    bool m_detectionEnabled;
+    float m_confThreshold;
+    float m_nmsThreshold;
+    int m_detectionInterval;
+    qint64 m_lastDetectionTime;
+    bool m_detectionInProgress;
     QMutex m_detectionMutex;
+    QThreadPool *m_threadPool;
+    QStringList m_classNames;
+    static constexpr int MODEL_INPUT_SIZE = 640;
+    static constexpr int NUM_CLASSES = 12;
 
-    // Memory pool for reusing buffers
-    QByteArray m_reusableBuffer;
-    QMutex m_bufferMutex;
+    // Detection persistence
+    struct Detection {
+        cv::Rect rect;
+        QString label;
+        float confidence;
+        qint64 timestamp;
+    };
+    QList<Detection> m_lastDetection;
+    qint64 m_lastGoodDetectionTime;
+    const qint64 PERSISTENCE_TIME = 5000;
 };
 
 #endif // RTSVIDEOWORKER_H
