@@ -189,11 +189,12 @@ Page {
 
                                     Behavior on color { ColorAnimation { duration: 100 } }
 
-                                    Text {
+                                    Image {
                                         anchors.centerIn: parent
-                                        text: "\u260E"
-                                        font.pixelSize: 16
-                                        color: "#FFFFFF"
+                                        width: 22
+                                        height: 22
+                                        source: "qrc:/assets/hotlines/whatsapp.apng"
+                                        fillMode: Image.PreserveAspectFit
                                     }
 
                                     MouseArea {
