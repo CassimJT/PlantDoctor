@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Page {
+    id:signInScreen
     width: 360
     height: 800
     background: Rectangle { color: "#e8efe6" }
