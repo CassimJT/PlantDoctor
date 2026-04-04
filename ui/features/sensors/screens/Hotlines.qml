@@ -12,28 +12,28 @@ Page {
         id: contactModel
 
         ListElement {
-            name: "John Doe"
-            role: "Agricultural Officer"
-            phone: "+265991000001"
-            whatsapp: "+265991000001"
+            name: "Cassim Twaibu"
+            role: "Project manager "
+            phone: "+265 883 56 07 59"
+            whatsapp: "+265 883 56 07 59"
         }
         ListElement {
-            name: "Jane Smith"
+            name: "Lisbeth Kumakanga"
             role: "Plant Pathologist"
-            phone: "+265991000002"
-            whatsapp: "+265991000002"
+            phone: "+265 993 52 11 37"
+            whatsapp: "+265 993 52 11 37"
         }
         ListElement {
-            name: "David Banda"
+            name: "Daud Osman"
             role: "Agronomist"
-            phone: "+265991000003"
-            whatsapp: "+265991000003"
+            phone: "+265 988 65 08 54"
+            whatsapp: "+265 988 65 08 54"
         }
         ListElement {
-            name: "Grace Phiri"
+            name: "Noel Gonthi"
             role: "Soil Scientist"
-            phone: "+265991000004"
-            whatsapp: "+265991000004"
+            phone: "+265 997 46 48 88"
+            whatsapp: "+265 997 46 48 88"
         }
     }
 
