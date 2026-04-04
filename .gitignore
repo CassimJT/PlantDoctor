@@ -67,3 +67,9 @@ assets/modles/
 
 
 *_qmlcache.qrc
+*.pte
+*.onnx
+*.pt
+*.pth
+assets/model/*.pte
+android/src/main/assets/model/*.pte

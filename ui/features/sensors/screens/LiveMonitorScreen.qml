@@ -132,7 +132,7 @@ Page {
                 }
                 Text {
                     id: detectionStatusText
-                    text: videoOutput.detectionEnabled ? "Detection: ACTIVE ✓" : "Detection: DISABLED ✗"
+                    text: videoOutput.detectionEnabled ? "Detection: ACTIVE " : "Detection: DISABLED"
                     color: videoOutput.detectionEnabled ? "#4caf50" : "#f44336"
                     font.pixelSize: Qt.platform.os === "android" ? 12 : 11
                     font.bold: true
@@ -220,7 +220,7 @@ Page {
                 onClicked: {
                     if (videoOutput.detectionEnabled) {
                         videoOutput.detectionEnabled = false
-                        detectionStatusText.text = "Detection: DISABLED ✗"
+                        detectionStatusText.text = "Detection: DISABLED"
                         detectionStatusText.color = "#f44336"
                         console.log("Detection manually disabled")
                         notificationPopup.text = "Detection Disabled"
@@ -228,7 +228,7 @@ Page {
                         notificationPopupTimer.start()
                     } else {
                         videoOutput.detectionEnabled = true
-                        detectionStatusText.text = "Detection: ACTIVE ✓"
+                        detectionStatusText.text = "Detection: ACTIVE "
                         detectionStatusText.color = "#4caf50"
                         console.log("Detection manually enabled")
                         notificationPopup.text = "Detection Enabled - Scanning for pests"
