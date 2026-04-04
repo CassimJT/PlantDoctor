@@ -7,196 +7,246 @@ Page {
 
     background: Rectangle {
         anchors.fill: parent
-        color: "#e8efe6"
+        color: "#edf2e0"
     }
+
     ColumnLayout {
         anchors.centerIn: parent
+        spacing: 50
+        width: parent.width
 
-
-        // App Logo
-        Image {
-            id: appLogo
-            source: "qrc:/assets/home/logo.png"
-            fillMode: Image.PreserveAspectFit
-
-            Layout.preferredWidth: 80
-            Layout.preferredHeight: 80
-            Layout.alignment: Qt.AlignHCenter
-        }
-        // Welcome Text
-        Text {
-            id: welcomeText
-            text: qsTr("Welcome!")
-            font.bold: true
-            font.pointSize: 25
+        //firts contaneir
+        ColumnLayout{
 
             Layout.alignment: Qt.AlignHCenter
-        }
-        Text {
-            id: hint
-            text: qsTr("Tap the camera icon to capture a photo or select from Gallery")
+            Layout.preferredWidth: parent.width
 
-            font.pointSize: 12
-
-
-            Layout.alignment: Qt.AlignHCenter
-        }
-
-        Item {
-            Layout.preferredWidth: 10
-            Layout.preferredHeight: 30
-        }
-        // Camera Preview Area
-        Rectangle {
-            id: cameraField
-            Layout.preferredWidth: 260
-            Layout.preferredHeight: 320
-            radius: 20
-            color: "#cfd8cc"
-            Layout.alignment: Qt.AlignHCenter
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-                    // will open camera upon clicking
-                    Helper.requestCameraPeremision()
-                    mainStackView?.push("CameraScreen.qml")
-                }
-            }
-
-            // Placeholder image (what camera would show)
+            // App Logo
             Image {
-                anchors.fill: parent
-                anchors.margins: 10
-                source: "qrc:/assets/home/leaf.png"
+                id: appLogo
+                source: "qrc:/assets/home/logo.png"
                 fillMode: Image.PreserveAspectFit
+                Layout.preferredWidth: 80
+                Layout.preferredHeight: 80
+                Layout.alignment: Qt.AlignHCenter
             }
 
-            //animation effect
+            // Welcome Text
+            Text {
+                id: welcomeText
+                text: qsTr("Welcome!")
+                font.bold: true
+                font.pointSize: 25
+                Layout.alignment: Qt.AlignHCenter
+            }
 
+
+
+            Text {
+                id: hint
+                text: qsTr("Tap the camera icon to capture a photo or select from Gallery")
+                Layout.preferredWidth: parent.width * 0.7
+                wrapMode: Text.WordWrap
+                font.pixelSize: 16
+                Layout.alignment: Qt.AlignHCenter
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+        }
+
+       //second contaneir
+        ColumnLayout{
+
+            Layout.alignment: Qt.AlignHCenter
+
+            // Camera Preview Area
             Rectangle {
-                id: scanLine
-                width: parent.width - 40
-                height: 3
-                color: "#00ff88"
-                opacity: 0.9
+                id: cameraField
+                Layout.preferredWidth: 260
+                Layout.preferredHeight: 320
+                radius: 20
+                color: "#cfd8cc"
+                Layout.alignment: Qt.AlignHCenter
+                clip: true
 
-                radius: 2
-                anchors.horizontalCenter: parent.horizontalCenter
-                y: 20
-
-
-
-                SequentialAnimation {
-                    running: true
-                    loops: Animation.Infinite
-
-                    NumberAnimation {
-                        target: scanLine
-                        property: "y"
-                        from: 20
-                        to: cameraField.height - 20
-                        duration: 2000
-                        easing.type: Easing.InOutQuad
-                    }
-
-                    NumberAnimation {
-                        target: scanLine
-                        property: "y"
-                        from: cameraField.height - 20
-                        to: 20
-                        duration: 2000
-                        easing.type: Easing.InOutQuad
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        Helper.requestCameraPeremision()
+                        mainStackView?.push("CameraScreen.qml")
                     }
                 }
-            }
 
-            // Scanner Frame (corners)
-            Item {
-                anchors.fill: parent
+                // Placeholder image
+                Image {
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    source: "qrc:/assets/home/leaf.png"
+                    fillMode: Image.PreserveAspectFit
+                }
 
-                Repeater {
-                    model: 4
+                // scan line matching CameraScreen
+                Rectangle {
+                    id: scanLine
+                    width: parent.width - 40
+                    height: 2
+                    radius: 1
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    y: 20
 
-                    Rectangle {
-                        width: 40
-                        height: 3
-                        color: "white"
+                    gradient: Gradient {
+                        orientation: Gradient.Horizontal
+                        GradientStop { position: 0.0; color: "transparent" }
+                        GradientStop { position: 0.3; color: "#885dde7a" }
+                        GradientStop { position: 0.5; color: "#ff5dde7a" }
+                        GradientStop { position: 0.7; color: "#885dde7a" }
+                        GradientStop { position: 1.0; color: "transparent" }
+                    }
 
-                        property int pos: index
-
-                        anchors {
-                            top: pos < 2 ? parent.top : undefined
-                            bottom: pos >= 2 ? parent.bottom : undefined
-                            left: pos % 2 === 0 ? parent.left : undefined
-                            right: pos % 2 === 1 ? parent.right : undefined
-                            margins: 15
+                    SequentialAnimation {
+                        running: true
+                        loops: Animation.Infinite
+                        NumberAnimation {
+                            target: scanLine; property: "y"
+                            from: 20; to: cameraField.height - 20
+                            duration: 2200; easing.type: Easing.InOutSine
+                        }
+                        NumberAnimation {
+                            target: scanLine; property: "y"
+                            from: cameraField.height - 20; to: 20
+                            duration: 2200; easing.type: Easing.InOutSine
                         }
                     }
                 }
 
-                Repeater {
-                    model: 4
+                // Scanner Frame (corners)
+                Item {
+                    anchors.fill: parent
 
-                    Rectangle {
-                        width: 3
-                        height: 40
-                        color: "white"
+                    Repeater {
+                        model: 4
+                        Rectangle {
+                            width: 40
+                            height: 3
+                            color: "white"
+                            property int pos: index
+                            anchors {
+                                top: pos < 2 ? parent.top : undefined
+                                bottom: pos >= 2 ? parent.bottom : undefined
+                                left: pos % 2 === 0 ? parent.left : undefined
+                                right: pos % 2 === 1 ? parent.right : undefined
+                                margins: 15
+                            }
+                        }
+                    }
 
-                        property int pos: index
-
-                        anchors {
-                            top: pos < 2 ? parent.top : undefined
-                            bottom: pos >= 2 ? parent.bottom : undefined
-                            left: pos % 2 === 0 ? parent.left : undefined
-                            right: pos % 2 === 1 ? parent.right : undefined
-                            margins: 15
+                    Repeater {
+                        model: 4
+                        Rectangle {
+                            width: 3
+                            height: 40
+                            color: "white"
+                            property int pos: index
+                            anchors {
+                                top: pos < 2 ? parent.top : undefined
+                                bottom: pos >= 2 ? parent.bottom : undefined
+                                left: pos % 2 === 0 ? parent.left : undefined
+                                right: pos % 2 === 1 ? parent.right : undefined
+                                margins: 15
+                            }
                         }
                     }
                 }
-            }
 
-            // Camera Icon Button
+                // Camera Icon Button
+                Rectangle {
+                    width: 60
+                    height: 60
+                    radius: 30
+                    color: "#ffffff"
+                    opacity: 0.4
+                    border.color: "white"
+                    border.width: 1
+                    anchors.centerIn: parent
+
+                    Image {
+                        id: cameraIcon
+                        source: "qrc:/assets/home/icons8-camera-90.png"
+                        width: 50
+                        height: 50
+                        fillMode: Image.PreserveAspectFit
+                        anchors.centerIn: parent
+                        opacity: 0.6
+                    }
+                }
+            }
+        }
+
+            //Gallery button
+        ColumnLayout {
+            Layout.alignment: Qt.AlignHCenter
+
             Rectangle {
-                width: 60
+                width: 220
                 height: 60
                 radius: 30
-                color: "#ffffff"
-                opacity: 0.4
-                border.color: "white"
-                border.width: 1
-                anchors.centerIn: parent
+                Layout.alignment: Qt.AlignHCenter
 
+                gradient: Gradient {
+                    orientation: Gradient.Horizontal
+                    GradientStop { position: 0.0; color: galleryArea.containsPress ? "#2a9e48" : "#34c45a" }
+                    GradientStop { position: 1.0; color: galleryArea.containsPress ? "#3dbf60" : "#5dde7a" }
+                }
 
-                // will have to replace this with an icon
-                Image {
-                    id: cameraIcon
-                    source: "qrc:/assets/home/icons8-camera-90.png"
-                    width: 50
-                    height: 50
-                    fillMode: Image.PreserveAspectFit
+                Rectangle {
+                    anchors { top: parent.top; left: parent.left; right: parent.right }
+                    height: parent.height / 2
+                    radius: parent.radius
+                    color: "#1affffff"
+                }
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: parent.radius
+                    color: "transparent"
+                    border.color: "#445dde7a"
+                    border.width: 1
+                }
+
+                Row {
                     anchors.centerIn: parent
-                    opacity: 0.6
+                    spacing: 10
+
+                    Image {
+                        source: "qrc:/assets/home/gallery-96.png"
+                        width: 24; height: 24
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Text {
+                        text: "Select from Gallery"
+                        color: "white"
+                        font.pointSize: 14
+                        font.bold: true
+                        font.letterSpacing: 0.6
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                scale: galleryArea.containsPress ? 0.97 : 1.0
+                Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutQuad } }
+
+                MouseArea {
+                    id: galleryArea
+                    anchors.fill: parent
+                    onClicked: {
+                        console.log("to phone gallery")
+                    }
                 }
             }
-
-
-
         }
 
-        // choose from Gallary
 
-        Button{
-            id:uploadButton
-            text: "Select from Gallery"
-            icon.source: "qrc:/assets/home/gallery-96.png"
-            icon.width: 30
-            icon.height: 30
-            Layout.alignment: Qt.AlignHCenter
-            font.pointSize: 18
-            font.bold: true
-        }
 
 
     }
-
 }
