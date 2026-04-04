@@ -53,6 +53,14 @@ Page {
             color: "#1A2E1F"
             font.letterSpacing: 0.3
         }
+        Item { Layout.preferredHeight: 6 }
+
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "Tap to call or message via WhatsApp"
+                    font.pixelSize: 13
+                    color: "#5A7A5E"
+                }
 
     }
 
