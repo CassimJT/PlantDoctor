@@ -1,55 +1,58 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import HistoryModel
 
 Page {
     id: inferenceResultScreen
+    topPadding: 30
+
+    property int timeDuration: 500
+    property int pauseDuration: 200
 
     property string imagePath: ""
-
-    // ── Placeholder data (replace with real inference results) ──
-    property string plantName:    "Spinach Plant"
-    property string diseaseName:  "Downy Mildew"
-
-    property real   riskLevel:    0.72   // 0.0 = Low, 1.0 = High
-    property string description:  "Downy mildew is a common and destructive fungal disease affecting spinach. Symptoms: Yellowish spots appear on the upper leaf surface. A purplish-gray mold develops on the underside of leaves."
-    property string noteText:     "Early detection and prompt action are crucial for managing downy mildew. If you suspect downy mildew in your spinach, consult a local agricultural extension agent for specific recommendations."
-    property var treatments: [
-        { title: "Fungicides",          body: "While fungicides can help control the spread, they cannot cure the disease. Preventive applications are essential. Consult local agricultural experts for recommended fungicides and application timing." },
-        { title: "Resistant Varieties", body: "Planting spinach varieties with resistance to downy mildew can significantly reduce the risk of infection." },
-        { title: "Crop Rotation",       body: "Avoid planting spinach in the same location year after year to break the disease cycle." }
-    ]
+    property string plantName: InfarenceRunner.diseaseName
+    property string diseaseName: InfarenceRunner.diseaseName
+    property real riskLevel: InfarenceRunner.riskLevel
+    property string description: InfarenceRunner.description
+    property real confidence: InfarenceRunner.confidence
+    property var treatments: InfarenceRunner.cure ? InfarenceRunner.cure.split("\n") : []
+    property string noteText: ""
 
     background: Rectangle { color: "#edf2e0" }
 
-    // Fade-in on load
     opacity: 0
-    Component.onCompleted: fadeIn.start()
+    Component.onCompleted: {
+        fadeIn.start()
+        fadeSequence.start()
+    }
+
     PropertyAnimation {
         id: fadeIn
         target: inferenceResultScreen
         property: "opacity"
-        from: 0; to: 1; duration: 380; easing.type: Easing.OutCubic
+        from: 0
+        to: 1
+        duration: 380
     }
 
-
-    // ── Scrollable content ───────────────────────────────────
     ScrollView {
         anchors {
-                top: parent.top
-                left: parent.left; right: parent.right
-                bottom: bottomBar.top
-            }
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            bottom: bottomBar.top
+        }
         contentWidth: availableWidth
         clip: true
 
         Column {
-            width: parent.width
-            spacing: 0
+            width: availableWidth
+            spacing: 10
             topPadding: 60
-            bottomPadding: 24
+            bottomPadding: 120
 
-            // ── Hero card ────────────────────────────────────
+            // ── Hero Card with Rounded Image ──
             Rectangle {
                 width: parent.width - 32
                 height: 100
@@ -57,171 +60,170 @@ Page {
                 radius: 16
                 color: "#1e2b1e"
 
-                // Drop shadow
-                layer.enabled: true
-                layer.effect: null
-
                 RowLayout {
-                    anchors {
-                        fill: parent
-                        margins: 14
-                    }
+                    anchors.fill: parent
+                    anchors.margins: 14
                     spacing: 14
 
-                    // Plant thumbnail
                     Rectangle {
-                        width: 75; height: 75
+                        width: 75
+                        height: 75
                         radius: 20
                         color: "#2d3d2d"
-                        clip: true
-                        Layout.alignment: Qt.AlignVCenter
 
                         Image {
-                            anchors.fill: parent
-                            source: imagePath ? "file://" + imagePath : ""
+                            id: thumbLoader
+                            visible: false
+                            source: imagePath
                             fillMode: Image.PreserveAspectCrop
-                            smooth: true
+                            onStatusChanged: {
+                                if (status === Image.Ready) {
+                                    thumbCanvas.requestPaint()
+                                }
+                            }
                         }
 
-                        // Fallback leaf icon if no image
+                        Canvas {
+                            id: thumbCanvas
+                            anchors.fill: parent
+                            onPaint: {
+                                var ctx = getContext("2d")
+                                ctx.clearRect(0, 0, width, height)
+                                var radius = 20
+
+                                ctx.beginPath()
+                                ctx.moveTo(radius, 0)
+                                ctx.lineTo(width - radius, 0)
+                                ctx.quadraticCurveTo(width, 0, width, radius)
+                                ctx.lineTo(width, height - radius)
+                                ctx.quadraticCurveTo(width, height, width - radius, height)
+                                ctx.lineTo(radius, height)
+                                ctx.quadraticCurveTo(0, height, 0, height - radius)
+                                ctx.lineTo(0, radius)
+                                ctx.quadraticCurveTo(0, 0, radius, 0)
+                                ctx.closePath()
+                                ctx.clip()
+
+                                if (thumbLoader.status === Image.Ready) {
+                                    ctx.drawImage(thumbLoader, 0, 0, width, height)
+                                }
+                            }
+                        }
+
                         Text {
                             anchors.centerIn: parent
-                            text: "🌿"
+                            text: ""
                             font.pointSize: 28
                             visible: imagePath === ""
                         }
                     }
 
-                    // Disease info
                     Column {
                         Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignVCenter
                         spacing: 4
 
                         Text {
-                            text: diseaseName
+                            id: titleText
+                            text: diseaseName.split(" ")[0]
                             color: "white"
-                            font.pointSize: 18
                             font.bold: true
-                            font.letterSpacing: 0.2
+                            opacity: 0
+                            Behavior on opacity { NumberAnimation { duration: timeDuration } }
                         }
+
                         Text {
+                            id: plantNameText
                             text: plantName
-                            color: "#88aa88"   // ← plain ASCII a's
-                            font.pointSize: 12
-                            font.letterSpacing: 0.3
+                            color: "#88aa88"
+                            opacity: 0
+                            Behavior on opacity { NumberAnimation { duration: timeDuration } }
                         }
                     }
-
-
                 }
             }
 
-            // Spacer
-            Item { width: 1; height: 20 }
+            Item { height: 20 }
 
-            // ── Section: Disease name ─────────────────────────
+            // ── Headings & Description ──
             Text {
-                text: diseaseName + " on " + plantName
-                color: "#1a2e1a"
-                font.pointSize: 14
-                font.bold: true
+                id: diseaseHeading
+                text: diseaseName + " on plant"
                 anchors.left: parent.left
                 anchors.leftMargin: 20
+                font.bold: true
+                opacity: 0
             }
 
-            Item { width: 1; height: 10 }
+            Item { height: 10 }
 
-            // Description
             Text {
+                id: descriptionText
                 text: description
-                color: "#556655"
-                font.pointSize: 11
+                width: availableWidth - 40
+                anchors.left: parent.left
+                anchors.leftMargin: 20
                 wrapMode: Text.WordWrap
-                lineHeight: 1.5
-                width: parent.width - 40
-                anchors.left: parent.left
-                anchors.leftMargin: 20
+                opacity: 0
+                Behavior on opacity { NumberAnimation { duration: timeDuration } }
             }
 
-            Item { width: 1; height: 22 }
+            Item { height: 22 }
 
-            // ── Section: Treatment ───────────────────────────
             Text {
+                id: treatmentHeading
                 text: "Treatment and Prevention"
-                color: "#1a2e1a"
-                font.pointSize: 14
-                font.bold: true
                 anchors.left: parent.left
                 anchors.leftMargin: 20
+                font.bold: true
+                opacity: 0
             }
 
-            Item { width: 1; height: 12 }
+            Item { height: 12 }
 
-            // Treatment bullet items
+            // ── Treatment Items ──
             Repeater {
+                id: treatmentRepeater
                 model: treatments
 
-                Column {
-                    width: parent.width - 40
+                Text {
+                    width: availableWidth - 40
                     anchors.left: parent.left
                     anchors.leftMargin: 20
-                    spacing: 4
-                    bottomPadding: 10
-
-                    Row {
-                        spacing: 8
-                        width: parent.width
-
-                        // Bullet dot
-                        Rectangle {
-                            width: 6; height: 6; radius: 3
-                            color: "#4a7c59"
-                            anchors.top: parent.top
-                            anchors.topMargin: 5
-                        }
-
-                        Text {
-                            width: parent.width - 14
-                            color: "#334433"
-                            font.pointSize: 11
-                            wrapMode: Text.WordWrap
-                            lineHeight: 1.5
-
-                            text: "<b>" + modelData.title + ":</b> " + modelData.body
-                            textFormat: Text.RichText
-                        }
-                    }
+                    wrapMode: Text.WordWrap
+                    text: "• " + modelData
+                    opacity: 0
+                    Behavior on opacity { NumberAnimation { duration: timeDuration } }
                 }
             }
 
-            Item { width: 1; height: 20 }
+            Item { height: 20 }
 
-
-            // ── Risk level card ───────────────────────────────────
+            // ── Risk Card ──
             Rectangle {
+                id: riskCard
                 width: parent.width - 32
                 anchors.horizontalCenter: parent.horizontalCenter
                 height: 90
                 radius: 14
                 color: "white"
-                border.color: "#e0e8de"; border.width: 1
+                border.color: "#e0e8de"
+                border.width: 1
+                opacity: 0
+                Behavior on opacity { NumberAnimation { duration: timeDuration } }
 
                 Column {
-                    anchors {
-                        fill: parent
-                        margins: 16
-                    }
+                    anchors.fill: parent
+                    anchors.margins: 16
                     spacing: 10
 
                     Text {
+                        id: riskHeading
                         text: "Risk life prediction"
-                        color: "#1a2e1a"
-                        font.pointSize: 12
                         font.bold: true
+                        opacity: 0
+                        Behavior on opacity { NumberAnimation { duration: timeDuration } }
                     }
 
-                    // Progress bar track
                     Rectangle {
                         width: parent.width
                         height: 6
@@ -242,95 +244,83 @@ Page {
                         }
                     }
 
-                    // Low / High labels
-                    Item {
+                    Item { height: 16 }
+
+                    RowLayout {
                         width: parent.width
-                        height: 16
+                        spacing: 0
 
                         Text {
-                            anchors.left: parent.left
                             text: "Low"
                             color: "#88aa88"
                             font.pointSize: 10
+                            anchors.left: parent.left
                         }
+
                         Text {
-                            anchors.right: parent.right
                             text: "High"
                             color: "#88aa88"
                             font.pointSize: 10
+                            anchors.right: parent.right
                         }
                     }
                 }
             }
-            Item { width: 1; height: 20 }
 
-            // ── Note card ─────────────────────────────────────
-            Rectangle {
-                width: parent.width - 32
-                anchors.horizontalCenter: parent.horizontalCenter
-                height: noteRow.implicitHeight + 32
-                radius: 14
-                color: "white"
-                border.color: "#e0e8de"; border.width: 1
+            Item { height: 40 }
 
-                RowLayout {
-                    id: noteRow
-                    anchors {
-                        fill: parent
-                        margins: 16
-                    }
-                    spacing: 14
+            // ── Floating Confidence Button ──
+            RowLayout {
+                id: confidenceRow
+                anchors.right: parent.right
+                anchors.rightMargin: 25
+                spacing: 6
 
-                    // Green icon box
-                    Rectangle {
-                        width: 42; height: 42; radius: 10
-                        color: "#4a7c59"
-                        Layout.alignment: Qt.AlignTop
+                Label {
+                    id: confiLabel
+                    text: "confidence"
+                    opacity: 0
+                    Layout.alignment: Qt.AlignHCenter
+                    Behavior on opacity { NumberAnimation { duration: timeDuration } }
+                }
 
-                        Text {
-                            anchors.centerIn: parent
-                            text: "✦"
-                            color: "white"
-                            font.pointSize: 14
-                        }
-                    }
+                RoundButton {
+                    id: roundBtn
+                    Layout.preferredWidth:  70
+                    Layout.preferredHeight:  70
+                    opacity: 0
+                    Behavior on opacity { NumberAnimation { duration: timeDuration } }
 
-                    Column {
-                        Layout.fillWidth: true
-                        spacing: 6
-
-                        Text {
-                            text: "Note:"
-                            color: "#1a2e1a"
-                            font.pointSize: 12
-                            font.bold: true
-                        }
-
-                        Text {
-                            text: noteText
-                            color: "#556655"
-                            font.pointSize: 11
-                            wrapMode: Text.WordWrap
-                            lineHeight: 1.5
-                            width: parent.width
-                        }
+                    Label {
+                        anchors.centerIn: parent
+                        text: confidence.toFixed(1) + "%"
+                        color: confidence < 50 ? "red" : "green"
+                        font.bold: true
                     }
                 }
             }
         }
     }
 
-    // ── Bottom action bar ────────────────────────────────────
+    // ── Bottom Bar ──
     Rectangle {
         id: bottomBar
-        anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
-        height: 96
+        anchors {
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+        }
+        height: 80
         color: "#f0f4ef"
 
-        // Top divider
         Rectangle {
-            anchors { top: parent.top; left: parent.left; right: parent.right }
-            height: 1; color: "#e0e8de"
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
+            height: 1
+            color: "#e0e8de"
         }
 
         RowLayout {
@@ -341,13 +331,13 @@ Page {
             }
             spacing: 14
 
-            // Re-generate
-            // Re-generate
             Rectangle {
-                Layout.fillWidth: true; height: 52
+                Layout.fillWidth: true
+                height: 52
                 radius: 26
                 color: "white"
-                border.color: "#c8d4c6"; border.width: 1.5
+                border.color: "#c8d4c6"
+                border.width: 1.5
 
                 Text {
                     anchors.centerIn: parent
@@ -364,27 +354,26 @@ Page {
                     id: regenArea
                     anchors.fill: parent
                     onClicked: {
-                        // Pop both InferenceResultScreen and CameraScreen off the stack
-                        // then push a fresh CameraScreen so camera restarts cleanly
-                        mainLoader.item.mainStackView.pop()  // back to CameraScreen
-                        mainLoader.item.mainStackView.pop()  // back to HomeScreen
-                        mainLoader.item.mainStackView.push(
-                            "qrc:/qt/qml/PlantDoctor/ui/features/home/screens/CameraScreen.qml"
-                        )
+                        mainLoader.item.mainStackView.pop()
+                        mainLoader.item.mainStackView.pop()
                     }
                 }
             }
 
-            // Share
             Rectangle {
-                Layout.fillWidth: true; height: 52
+                Layout.fillWidth: true
+                height: 52
                 radius: 26
                 color: "#4a7c59"
 
-                // Shine
                 Rectangle {
-                    anchors { top: parent.top; left: parent.left; right: parent.right }
-                    height: parent.height / 2; radius: parent.radius
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        right: parent.right
+                    }
+                    height: parent.height / 2
+                    radius: parent.radius
                     color: "#15ffffff"
                 }
 
@@ -408,4 +397,45 @@ Page {
             }
         }
     }
+
+    // ── Sequential Fade-In Animations ──
+    SequentialAnimation {
+        id: fadeSequence
+
+        PropertyAnimation { target: titleText; property: "opacity"; to: 1; duration: timeDuration }
+        PauseAnimation { duration: pauseDuration }
+
+        PropertyAnimation { target: plantNameText; property: "opacity"; to: 1; duration: timeDuration }
+        PauseAnimation { duration: pauseDuration }
+
+        PropertyAnimation { target: diseaseHeading; property: "opacity"; to: 1; duration: timeDuration }
+        PauseAnimation { duration: pauseDuration }
+
+        PropertyAnimation { target: descriptionText; property: "opacity"; to: 1; duration: timeDuration }
+        PauseAnimation { duration: pauseDuration }
+
+        PropertyAnimation { target: treatmentHeading; property: "opacity"; to: 1; duration: timeDuration }
+        PauseAnimation { duration: pauseDuration }
+
+        ScriptAction {
+            script: {
+                for (let i = 0; i < treatmentRepeater.count; i++) {
+                    let item = treatmentRepeater.itemAt(i)
+                    if (item) item.opacity = 1
+                }
+            }
+        }
+
+        PauseAnimation { duration: pauseDuration }
+
+        PropertyAnimation { target: riskHeading; property: "opacity"; to: 1; duration: timeDuration }
+        PauseAnimation { duration: pauseDuration }
+
+        PropertyAnimation { target: riskCard; property: "opacity"; to: 1; duration: timeDuration }
+        PauseAnimation { duration: pauseDuration }
+
+        PropertyAnimation { target: roundBtn; property: "opacity"; to: 1; duration: timeDuration }
+        PropertyAnimation { target: confiLabel; property: "opacity"; to: 1; duration: timeDuration }
+    }
+
 }

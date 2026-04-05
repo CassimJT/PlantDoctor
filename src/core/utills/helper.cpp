@@ -132,6 +132,19 @@ QString Helper::imagePreview()
 {
     return m_imagePath;
 }
+
+bool Helper::getIsCamera() const
+{
+    return isCamera;
+}
+
+void Helper::setIsCamera(bool newIsCamera)
+{
+    if (isCamera == newIsCamera)
+        return;
+    isCamera = newIsCamera;
+    emit isCameraChanged(isCamera);
+}
 /**
  * @brief Helper::setAnAndroidSystemBarTextColor
  */

@@ -31,6 +31,7 @@ ApplicationWindow {
         onMenuClicked: {
             if(mainLoader.item && mainLoader.item.mainStackView.depth > 1) {
                 mainLoader.item.mainStackView.pop()
+                Helper.setIsCamera(true)
             }else {
                 drawer.open();
             }

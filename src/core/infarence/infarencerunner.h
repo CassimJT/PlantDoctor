@@ -36,6 +36,7 @@ class InfarenceRunner : public QObject
     Q_PROPERTY(float confidence READ confidence NOTIFY confidenceChanged)
     Q_PROPERTY(int classIndex READ classIndex NOTIFY classIndexChanged)
     Q_PROPERTY(bool isModelLoaded READ getIsModelLoaded NOTIFY isModelLoadedChanged)
+    Q_PROPERTY(float riskLevel READ riskLevel WRITE setRiskLevel NOTIFY riskLevelChanged FINAL)
 
 public:
     explicit InfarenceRunner(QObject *parent = nullptr);
@@ -54,6 +55,9 @@ public:
     Q_INVOKABLE QStringList availableLanguages() const;
     Q_INVOKABLE QString currentLanguage() const;
 
+    float riskLevel() const;
+    void setRiskLevel(float newRiskLevel);
+
 public slots:
     void classifyImage(const QString &imageDataBase64);
     void loadModel();
@@ -69,6 +73,8 @@ signals:
     void infarenceFinished();
     void infarenceFailed(const QString& error);
     void languageChanged(const QString& language);
+
+    void riskLevelChanged();
 
 private:
     // Helper methods - declare these as private
@@ -92,6 +98,7 @@ private:
     QString m_description;
     QString m_cure;
     float m_confidence;
+    float m_riskLevel = 0.0f;
     int m_classIndex;
 
     ModulePtr module;
@@ -100,6 +107,7 @@ private:
     // Constants
     static constexpr int MODEL_INPUT_SIZE = 224;
     static constexpr int NUM_CLASSES = 38;
+
 };
 
 #endif // INFARENCERUNNER_H

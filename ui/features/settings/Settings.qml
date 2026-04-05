@@ -9,6 +9,7 @@ Page {
     TabBar {
         id: tabBar
         width: parent.width
+        currentIndex: view.currentIndex
         anchors {
             top: parent.top
             topMargin: 70

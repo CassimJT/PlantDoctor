@@ -27,5 +27,6 @@
         <file>assets/home/icons8-analyse-60.png</file>
         <file>assets/settings/PND.svg</file>
         <file>assets/settings/PND.png</file>
+        <file>assets/infarence/delete.png</file>
     </qresource>
 </RCC>

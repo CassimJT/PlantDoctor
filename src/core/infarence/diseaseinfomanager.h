@@ -11,6 +11,7 @@ struct DiseaseInfo {
     QString name;
     QString description;
     QString cure;
+    float riskLevel = 0.0f;
 
     bool isValid() const { return !name.isEmpty(); }
 };
@@ -29,7 +30,7 @@ public:
     QString getDiseaseName(int classId) const;
     QString getDiseaseDescription(int classId) const;
     QString getDiseaseCure(int classId) const;
-
+    float getDiseaseRiskLevel(int classId) const;
     QStringList availableLanguages() const;
     QString currentLanguage() const { return m_currentLanguage; }  // Inline implementation
 

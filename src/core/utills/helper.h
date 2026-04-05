@@ -30,12 +30,15 @@ public:
     Q_INVOKABLE void setStatusBarAppearance(const QColor &backgroundColor, bool darkIcons);
     Q_INVOKABLE void requestCameraPeremision();
 
+    bool getIsCamera() const;
+
 public slots:
     void setIsHompage(bool newIsHompage);
 
     void imageToDataUrl(const QImage &image);
 
     void loadImageFromContentUri(const QString &uri);
+    void setIsCamera(bool newIsCamera);
 
     QString localFilePath();
 
@@ -46,12 +49,16 @@ signals:
     void imageReady();
     void isHompageChanged();
 
+    void isCameraChanged(bool isCamera);
+
 private:
     QString m_imagePath;
     QString m_localPath;
     bool isHompage;
+    bool isCamera;
 
 
+    Q_PROPERTY(bool isCamera READ getIsCamera WRITE setIsCamera NOTIFY isCameraChanged FINAL)
 };
 
 #endif // HELPER_H

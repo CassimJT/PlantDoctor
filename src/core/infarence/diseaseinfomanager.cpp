@@ -83,7 +83,7 @@ bool DiseaseInfoManager::loadLanguage(const QString& languageCode)
 
                                 DiseaseInfo info;
                                 info.name = obj["name"].toString();
-
+                                info.riskLevel = static_cast<float>(obj["riskLevel"].toDouble(0.0));
                                 // Handle description (can be string or array)
                                 if (obj["description"].isArray()) {
                                     QStringList descParts;
@@ -169,6 +169,11 @@ QString DiseaseInfoManager::getDiseaseDescription(int classId) const
 QString DiseaseInfoManager::getDiseaseCure(int classId) const
 {
     return m_diseaseInfo.value(classId).cure;
+}
+
+float DiseaseInfoManager::getDiseaseRiskLevel(int classId) const
+{
+      return m_diseaseInfo.value(classId).riskLevel;
 }
 
 QStringList DiseaseInfoManager::availableLanguages() const

@@ -99,6 +99,7 @@ qt_add_qml_module(appPlantDoctor
         src/core/rtsp/rtsvideoworker.cpp
         src/core/rtsp/rtsvideooutput.h
         src/core/rtsp/rtsvideooutput.cpp
+        QML_FILES ui/features/home/screens/ImagePreviewScreen.qml
 
 
 

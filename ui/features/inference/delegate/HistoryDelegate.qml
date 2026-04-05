@@ -1,65 +1,63 @@
 import QtQuick
 import QtQuick.Controls
 import HistoryModel
+import QtQuick.Layouts
 
 ItemDelegate {
     id: itemDelegate
     width: parent.width
     height: 50
-    Row {
+
+    Rectangle {
         anchors.fill: parent
-        anchors {
-            margins: 10
-            rightMargin:15
-        }
-        spacing: 15
-        // Disease Name
-        Text {
-            id: diseaseNameLabel
-            width: parent.width * 0.50
-            text: diseaseName
-            elide: Text.ElideRight
-            font.pixelSize: 16
-            anchors.verticalCenter: parent.verticalCenter
-            color: "#ffffff"
-        }
+        color: "transparent"
+        anchors.margins: 6
 
-        // Date
-        Label {
-            id: dateLabel
-            width: parent.width * 0.29
-            text: date
-            font.pixelSize: 14
-            color: "#666"
-             horizontalAlignment: Text.AlignLeft
-            anchors.verticalCenter: parent.verticalCenter
-        }
+        RowLayout {
+            id: rowLayout
+            anchors.fill: parent
+            spacing: 10
 
-        // Delete icon
-        Image {
-            id: deleteIcon
-            source: "qrc:/assets/com/delete.png"
-            width: 24
-            height: 24
-            fillMode: Image.PreserveAspectFit
-            anchors.verticalCenter: parent.verticalCenter
+            // Disease Name
+            Text {
+                id: diseaseNameLabel
+                Layout.fillWidth: true
+                text: diseaseName
+                elide: Text.ElideRight
+                font.pixelSize: 16
+                verticalAlignment: Text.AlignVCenter
+                color: "#333"
+            }
 
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    HistoryModel.deleteHistory(index)
+            // Delete icon
+            Item {
+                width: 26
+                height: 26
+
+                Image {
+                    id: deleteIcon
+                    anchors.fill: parent
+                    source: "qrc:/assets/infarence/delete.png"
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        HistoryModel.deleteHistory(index)
+                    }
                 }
             }
         }
     }
+
     onClicked: {
-        //go to infareceHistor
-        mainLoader.item.mainStackView.push("../Pages/InfarenceHistoryPage.qml",{
-                                                "classIndex":classIndex,
-                                                "diseaseName":diseaseName,
-                                                "confidence":confidence
-                                   })
-        mainRoot.drawer.close()
+        /*mainLoader.item.mainStackView.push("../Pages/InfarenceHistoryPage.qml",{
+                                               "classIndex": classIndex,
+                                               "diseaseName": diseaseName,
+                                               "confidence": confidence
+                                           })
+        mainRoot.drawer.close()*/
     }
 }

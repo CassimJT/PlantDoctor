@@ -71,6 +71,7 @@ void InfarenceRunner::updateDiseaseInfo(int classId)
     setDiseaseName(info.name);
     setDescription(info.description);
     setCure(info.cure);
+    setRiskLevel(info.riskLevel);
 }
 
 void InfarenceRunner::classifyImage(const QString &imageDataBase64)
@@ -386,4 +387,17 @@ QString InfarenceRunner::prepareModelFile()
 
     qDebug() << "Model copied to:" << targetPath;
     return targetPath;
+}
+
+float InfarenceRunner::riskLevel() const
+{
+    return m_riskLevel;
+}
+
+void InfarenceRunner::setRiskLevel(float newRiskLevel)
+{
+    if (qFuzzyCompare(m_riskLevel, newRiskLevel))
+        return;
+    m_riskLevel = newRiskLevel;
+    emit riskLevelChanged();
 }

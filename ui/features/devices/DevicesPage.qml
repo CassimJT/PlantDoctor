@@ -1,74 +1,70 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import "./delegate"
-//import "./model"
+import QtQuick.Layouts
 
 Page {
     id: devicesPage
     padding: 20
-
     // Message when no devices are connected
-    Item {
+    ColumnLayout {
+        spacing: 15
         anchors.centerIn: parent
+
         visible: DeviceModel && DeviceModel.count === 0 &&
                  DeviceConfigurator && !DeviceConfigurator.isScanning
+        Text {
+            text: "No Devices Connected"
+            font.pixelSize: 18
+            font.bold: true
+            color: "#999"
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
 
-        Column {
-            spacing: 15
-            anchors.centerIn: parent
+        Text {
+            text: DeviceConfigurator && !DeviceConfigurator.isBrokerConnected
+                  ? "Connect to MQTT broker to discover devices"
+                  : "Click below to scan for devices"
+            font.pixelSize: 14
+            color: "#aaa"
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
 
-            Text {
-                text: "No Devices Connected"
-                font.pixelSize: 18
-                font.bold: true
-                color: "#999"
-                anchors.horizontalCenter: parent.horizontalCenter
+        Button {
+            id: centerButton
+            flat: true
+            Layout.alignment: Qt.AlignHCenter
+            visible: DeviceModel && DeviceModel.count === 0 &&
+                     DeviceConfigurator && !DeviceConfigurator.isScanning
+
+            text: {
+                if (!DeviceConfigurator) return "Loading..."
+                if (!DeviceConfigurator.isBrokerConnected)
+                    return "Connect to Broker"
+                else if (DeviceConfigurator.isScanning)
+                    return "Scanning..."
+                else
+                    return "Scan for Devices"
             }
 
-            Text {
-                text: DeviceConfigurator && !DeviceConfigurator.isBrokerConnected
-                      ? "Connect to MQTT broker to discover devices"
-                      : "Click below to scan for devices"
-                font.pixelSize: 14
-                color: "#aaa"
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
+            enabled: DeviceConfigurator &&
+                     !DeviceConfigurator.isScanning &&
+                     DeviceConfigurator.isBrokerConnected
 
-            Button {
-                id: centerButton
-                visible: DeviceModel && DeviceModel.count === 0 &&
-                         DeviceConfigurator && !DeviceConfigurator.isScanning
-
-                text: {
-                    if (!DeviceConfigurator) return "Loading..."
-                    if (!DeviceConfigurator.isBrokerConnected)
-                        return "Connect to Broker"
-                    else if (DeviceConfigurator.isScanning)
-                        return "Scanning..."
-                    else
-                        return "Scan for Devices"
+            onClicked: {
+                if (!DeviceConfigurator) return
+                if (!DeviceConfigurator.isBrokerConnected) {
+                    DeviceConfigurator.connectToBroker()
+                } else {
+                    DeviceConfigurator.scanForDevices(10)
                 }
-
-                enabled: DeviceConfigurator &&
-                         !DeviceConfigurator.isScanning &&
-                         DeviceConfigurator.isBrokerConnected
-
-                onClicked: {
-                    if (!DeviceConfigurator) return
-                    if (!DeviceConfigurator.isBrokerConnected) {
-                        DeviceConfigurator.connectToBroker()
-                    } else {
-                        DeviceConfigurator.scanForDevices(10)
-                    }
-                }
-
-                width: 200
-                height: 50
-                anchors.bottomMargin: -40
-
             }
+
+            width: 200
+            height: 50
         }
     }
+
 
     ListView {
         id: gridView
@@ -86,7 +82,7 @@ Page {
 
     // Busy indicator when not connected
     BusyIndicator {
-          id: scanningIndicator
+        id: scanningIndicator
         anchors.centerIn: parent
         width: 80
         height: 80

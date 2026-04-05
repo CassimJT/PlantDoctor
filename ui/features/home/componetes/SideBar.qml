@@ -92,6 +92,7 @@ Drawer {
             right: parent.right
             bottom: user_id.top
             left: frame.right
+
         }
     }
     RoundButton {

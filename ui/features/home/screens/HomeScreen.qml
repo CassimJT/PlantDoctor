@@ -1,14 +1,15 @@
 import QtQuick 2.15
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 
 Page {
     id: homescreen
-
     background: Rectangle {
         anchors.fill: parent
         color: "#edf2e0"
     }
+    topPadding: 50
 
     ColumnLayout {
         anchors.centerIn: parent
@@ -26,8 +27,8 @@ Page {
                 id: appLogo
                 source: "qrc:/assets/home/logo.png"
                 fillMode: Image.PreserveAspectFit
-                Layout.preferredWidth: 80
-                Layout.preferredHeight: 80
+                Layout.preferredWidth: 70
+                Layout.preferredHeight: 70
                 Layout.alignment: Qt.AlignHCenter
             }
 
@@ -40,14 +41,13 @@ Page {
                 Layout.alignment: Qt.AlignHCenter
             }
 
-
-
             Text {
                 id: hint
                 text: qsTr("Tap the camera icon to capture a photo or select from Gallery")
                 Layout.preferredWidth: parent.width * 0.7
                 wrapMode: Text.WordWrap
-                font.pixelSize: 16
+                font.pixelSize: 14
+                color: "#333"
                 Layout.alignment: Qt.AlignHCenter
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -189,7 +189,7 @@ Page {
             Rectangle {
                 width: 220
                 height: 60
-                radius: 30
+                radius: 15
                 Layout.alignment: Qt.AlignHCenter
 
                 gradient: Gradient {
@@ -239,14 +239,36 @@ Page {
                     id: galleryArea
                     anchors.fill: parent
                     onClicked: {
-                        console.log("to phone gallery")
+                        fileDialog.open()
                     }
                 }
             }
         }
+        //--------dialgo section-----
+            FileDialog {
+                id: fileDialog
+                title: "Select an Image"
+                onAccepted: {
+                    console.log("Selected file:", fileDialog.selectedFile);
+                    var path = fileDialog.selectedFile
+                    Helper.loadImageFromContentUri(path)
+                    mainStackView.push("ImagePreviewScreen.qml")
+                }
 
+                onRejected: {
+                    console.log("File selection canceled.");
+                }
+            }
 
-
+            //----connection section ---------------
+            Connections {
+                target: Helper
+                function onImageReady() {
+                    var preview = Helper.imagePreview()
+                    var path = Helper.localFilePath()
+                    
+                }
+            }
 
     }
 }

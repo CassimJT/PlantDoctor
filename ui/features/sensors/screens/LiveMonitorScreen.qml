@@ -193,17 +193,17 @@ Page {
             Button {
                 id: enableDetectionButton
                 width: Qt.platform.os === "android" ? 160 : 140
-                height: 40
+                height: 50
                 enabled: videoOutput.isConnected
                 opacity: enabled ? 1.0 : 0.5
 
                 background: Rectangle {
                     color: videoOutput.detectionEnabled ? "#f44336" : "#4caf50"
-                    radius: 20
+                    radius: 15
 
                     Rectangle {
                         anchors.fill: parent
-                        radius: 20
+                        radius: 15
                         color: parent.parent.pressed ? "#ffffff20" : "transparent"
                     }
                 }
@@ -241,15 +241,15 @@ Page {
             Button {
                 id: reconnectButton
                 width: Qt.platform.os === "android" ? 140 : 120
-                height: 40
+                height: 50
                 visible: !videoOutput.isConnected
 
                 background: Rectangle {
                     color: "cyan"
-                    radius: 20
+                    radius: 15
                     Rectangle {
                         anchors.fill: parent
-                        radius: 20
+                        radius: 15
                         color: parent.parent.pressed ? "#ffffff20" : "transparent"
                     }
                 }
@@ -283,8 +283,8 @@ Page {
             bottomMargin: 10
         }
         width: notificationText.width + 40
-        height: 40
-        radius: 20
+        height: 50
+        radius: 15
         color: "#cc000000"
         visible: false
 
