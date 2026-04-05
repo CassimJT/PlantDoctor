@@ -1,17 +1,21 @@
 #include "pnddevice.h"
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QDateTime>
 
 PNDDevice::PNDDevice(const QString &deviceId, QObject *parent)
-    : QObject(parent)
-    , m_deviceId(deviceId)
-    , m_state(PNDDeviceState::DISCONNECTED)
-    , m_temperature(0.0f)
-    , m_humidity(0.0f)
-    , m_lastSeen(QDateTime::currentDateTime().toString(Qt::ISODate))
+    : QObject(parent),
+    m_deviceId(deviceId),
+    m_state(PNDDeviceState::DISCONNECTED),
+    m_temperature(0.0f),
+    m_humidity(0.0f),
+    m_lastSeen(QDateTime::currentDateTime())
 {
 }
+
+
+// ==============================
+// Getters / Setters
+// ==============================
 
 QString PNDDevice::deviceId() const
 {
@@ -20,25 +24,29 @@ QString PNDDevice::deviceId() const
 
 void PNDDevice::setDeviceId(const QString &deviceId)
 {
-    if (m_deviceId != deviceId) {
-        m_deviceId = deviceId;
-        emit deviceIdChanged();
-    }
+    if (m_deviceId == deviceId)
+        return;
+
+    m_deviceId = deviceId;
+    emit deviceIdChanged();
 }
+
 
 int PNDDevice::state() const
 {
-    return static_cast<int>(m_state);  // Convert to int for QML
+    return static_cast<int>(m_state);
 }
 
 void PNDDevice::setState(PNDDeviceState::State state)
 {
-    if (m_state != state) {
-        m_state = state;
-        emit stateChanged();
-        emit dataUpdated();
-    }
+    if (m_state == state)
+        return;
+
+    m_state = state;
+    emit stateChanged();
+    emit dataUpdated();
 }
+
 
 float PNDDevice::temperature() const
 {
@@ -47,12 +55,14 @@ float PNDDevice::temperature() const
 
 void PNDDevice::setTemperature(float temperature)
 {
-    if (!qFuzzyCompare(m_temperature, temperature)) {
-        m_temperature = temperature;
-        emit temperatureChanged();
-        emit dataUpdated();
-    }
+    if (qFuzzyCompare(m_temperature, temperature))
+        return;
+
+    m_temperature = temperature;
+    emit temperatureChanged();
+    emit dataUpdated();
 }
+
 
 float PNDDevice::humidity() const
 {
@@ -61,30 +71,41 @@ float PNDDevice::humidity() const
 
 void PNDDevice::setHumidity(float humidity)
 {
-    if (!qFuzzyCompare(m_humidity, humidity)) {
-        m_humidity = humidity;
-        emit humidityChanged();
-        emit dataUpdated();
-    }
+    if (qFuzzyCompare(m_humidity, humidity))
+        return;
+
+    m_humidity = humidity;
+    emit humidityChanged();
+    emit dataUpdated();
 }
 
-QString PNDDevice::lastSeen() const
+
+QDateTime PNDDevice::lastSeen() const
 {
     return m_lastSeen;
 }
 
-void PNDDevice::setLastSeen(const QString &lastSeen)
+void PNDDevice::setLastSeen(const QDateTime &lastSeen)
 {
-    if (m_lastSeen != lastSeen) {
-        m_lastSeen = lastSeen;
-        emit lastSeenChanged();
-    }
+    if (m_lastSeen == lastSeen)
+        return;
+
+    m_lastSeen = lastSeen;
+    emit lastSeenChanged();
+    emit dataUpdated();   // 🔥 REQUIRED for model sync
 }
+
+
+// ==============================
+// JSON Handling
+// ==============================
 
 void PNDDevice::updateFromJson(const QByteArray &jsonData)
 {
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    if (!doc.isObject()) {
+    QJsonParseError err;
+    QJsonDocument doc = QJsonDocument::fromJson(jsonData, &err);
+
+    if (err.error != QJsonParseError::NoError || !doc.isObject()) {
         return;
     }
 
@@ -99,23 +120,26 @@ void PNDDevice::updateFromJson(const QByteArray &jsonData)
     }
 
     if (obj.contains("state") && obj["state"].isDouble()) {
-        int state = obj["state"].toInt();
-        if (state >= 0 && state <= 3) {
-            setState(static_cast<PNDDeviceState::State>(state));
+        int s = obj["state"].toInt();
+        if (s >= PNDDeviceState::DISCONNECTED && s <= PNDDeviceState::ERROR) {
+            setState(static_cast<PNDDeviceState::State>(s));
         }
     }
 
-    setLastSeen(QDateTime::currentDateTime().toString(Qt::ISODate));
+    // Always refresh lastSeen on valid update
+    setLastSeen(QDateTime::currentDateTime());
 }
+
 
 QByteArray PNDDevice::toJson() const
 {
     QJsonObject obj;
+
     obj["deviceId"] = m_deviceId;
     obj["state"] = static_cast<int>(m_state);
-    obj["temperature"] = static_cast<double>(m_temperature);
-    obj["humidity"] = static_cast<double>(m_humidity);
-    obj["lastSeen"] = m_lastSeen;
+    obj["temperature"] = m_temperature;
+    obj["humidity"] = m_humidity;
+    obj["lastSeen"] = m_lastSeen.toString(Qt::ISODate);
 
-    return QJsonDocument(obj).toJson();
+    return QJsonDocument(obj).toJson(QJsonDocument::Compact);
 }

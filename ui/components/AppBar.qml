@@ -21,7 +21,7 @@ Item {
                 right: parent.right
                 left: parent.left
                 bottom: parent.bottom
-                bottomMargin: 2
+                bottomMargin: 6
             }
             //Material.elevation: 7
             RowLayout{
@@ -56,6 +56,7 @@ Item {
 
                     font.pixelSize: 14
                     font.weight: Font.Medium
+                    font.bold: true
                     Layout.leftMargin: 30
                 }
                 Item {
@@ -106,7 +107,7 @@ Item {
                             icon.source: "qrc:/assets/appbar/settings.svg"
                             text: qsTr("Settings")
                             onClicked: {
-                                mainLoader.item && mainLoader.item.mainStackView.push("../features/sensors/screens/SettingsScreen.qml")
+                                mainLoader.item && mainLoader.item.mainStackView.push("../features/settings/Settings.qml")
 
                             }
                         }
