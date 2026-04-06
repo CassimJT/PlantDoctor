@@ -11,7 +11,7 @@ ItemDelegate {
     Rectangle {
         anchors.fill: parent
         color: "transparent"
-        anchors.margins: 6
+        anchors.margins: 8
 
         RowLayout {
             id: rowLayout
@@ -22,21 +22,27 @@ ItemDelegate {
             Text {
                 id: diseaseNameLabel
                 Layout.fillWidth: true
-                text: diseaseName
-                elide: Text.ElideRight
+                text: {
+                    if (diseaseName.length > 8) {
+                        return diseaseName.substring(0, 10) + "............"
+                    }
+                    return diseaseName
+                }
                 font.pixelSize: 16
                 verticalAlignment: Text.AlignVCenter
                 color: "#333"
             }
 
             // Delete icon
-            Item {
-                width: 26
-                height: 26
-
+            RoundButton {
+                width: 28
+                height: 28
+                flat: true
                 Image {
                     id: deleteIcon
-                    anchors.fill: parent
+                    width: 26
+                    height: width
+                    anchors.centerIn: parent
                     source: "qrc:/assets/infarence/delete.png"
                     fillMode: Image.PreserveAspectFit
                 }

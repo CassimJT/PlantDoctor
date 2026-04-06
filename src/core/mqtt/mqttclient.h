@@ -81,7 +81,7 @@ private:
 
     bool m_isConnected;
 
-    // 🔥 IMPORTANT: persistent topic registry (Python-equivalent)
+    // persistent topic registry (Python-equivalent)
     QHash<QString, quint8> m_topicRegistry;
 };
 

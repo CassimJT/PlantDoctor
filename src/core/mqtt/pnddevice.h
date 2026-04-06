@@ -43,7 +43,7 @@ signals:
     void humidityChanged();
     void lastSeenChanged();
 
-    // 🔥 IMPORTANT: single aggregation signal (used by model)
+    // single aggregation signal (used by model)
     void dataUpdated();
 
 private:

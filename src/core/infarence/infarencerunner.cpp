@@ -1,7 +1,6 @@
 #include "infarencerunner.h"
 #include <QCoreApplication>
 
-// Add these using directives to fix namespace issues
 using namespace executorch::extension;
 using executorch::runtime::EValue;
 
@@ -25,7 +24,7 @@ InfarenceRunner::InfarenceRunner(QObject *parent)
                 m_currentLanguage = language;
                 emit languageChanged(language);
 
-                // If we have a current classification, refresh the display
+                // refresh the display
                 if (m_classIndex >= 0) {
                     updateDiseaseInfo(m_classIndex);
                 }
