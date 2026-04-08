@@ -150,8 +150,8 @@ Popup {
                     }
                     if (DeviceConfigurator && deviceId) {
                         DeviceConfigurator.configureDevice(deviceId, {
-                            "auto_mode": checked
-                        })
+                                                               "auto_mode": checked
+                                                           })
                     }
                 }
                 indicator: Rectangle {
@@ -194,7 +194,7 @@ Popup {
                     }
                     if (DeviceConfigurator && deviceId) {
                         console.log("Setting device power:", deviceId, checked)
-                       // DeviceConfigurator.setDevicePower(deviceId, checked)
+                        DeviceConfigurator.setDevicePower(deviceId, checked)
                     }
                 }
                 indicator: Rectangle {

@@ -7,6 +7,7 @@ ItemDelegate {
     id: itemDelegate
     width: parent.width
     height: 50
+    Material.elevation: 4
 
     Rectangle {
         anchors.fill: parent
@@ -37,7 +38,6 @@ ItemDelegate {
             RoundButton {
                 width: 28
                 height: 28
-                flat: true
                 Image {
                     id: deleteIcon
                     width: 26

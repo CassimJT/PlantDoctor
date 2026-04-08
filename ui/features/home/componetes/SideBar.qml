@@ -105,7 +105,7 @@ Drawer {
         anchors {
             right: parent.right
             bottom: user_id.top
-            rightMargin: 25
+            rightMargin: 8
         }
         Image {
             id: clear

@@ -32,7 +32,7 @@ public:
     int discoveredDeviceCount() const;
     bool isBrokerConnected() const;
 
-    void setMqttBroker(const QString &host, int port);
+    Q_INVOKABLE void setMqttBroker(const QString &host, int port);
     void setMqttCredentials(const QString &username, const QString &password);
 
 public slots:
