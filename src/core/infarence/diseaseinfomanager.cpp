@@ -9,7 +9,7 @@
 #include <QStandardPaths>
 #include <QCoreApplication>
 
-const QString DiseaseInfoManager::DEFAULT_LANGUAGE = "en";
+const QString DiseaseInfoManager::DEFAULT_LANGUAGE = "ny";
 
 DiseaseInfoManager::DiseaseInfoManager(QObject *parent)
     : QObject(parent)

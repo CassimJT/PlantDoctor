@@ -6,42 +6,77 @@ Page {
     id: sysSettings
     objectName: "SystemSettings"
     padding: 12
-    // =======================
-    // Broker Settings Group
-    // =======================
-    GroupBox {
-        title: "Broker Settings"
+
+    ColumnLayout {
         width: parent.width
         anchors {
             top: parent.top
-            topMargin: 10
         }
 
-        ColumnLayout {
-            spacing: 10
-            width: parent.width
+        spacing: 12
 
-            Label {
-                text: "Broker Address:"
-                Layout.alignment: Qt.AlignLeft
-            }
+        // =======================
+        // Broker Settings Group
+        // =======================
+        GroupBox {
+            id: brokerGroupBox
+            title: "Broker Settings"
+            Layout.fillWidth: true
 
-            ComboBox {
-                id: brokerCombo
-                width: parent.width
-                editable: true
-                model: ["192.168.8.130", "192.168.8.149"]
+            ColumnLayout {
+                spacing: 10
+                Layout.fillWidth: true
 
-                onAccepted: {
-                    DeviceConfigurator.disconnectFromBroker()
-                    DeviceConfigurator.setMqttBroker(editText, 1883)
-                    DeviceConfigurator.connectToBroker()
+                Label {
+                    text: "Broker Address:"
                 }
 
-                onActivated: {
-                    DeviceConfigurator.disconnectFromBroker()
-                    DeviceConfigurator.setMqttBroker(model[index], 1883)
-                    DeviceConfigurator.connectToBroker()
+                ComboBox {
+                    id: brokerCombo
+                    Layout.fillWidth: true
+                    editable: true
+                    model: ["192.168.8.149", "192.168.8.130"]
+
+                    onAccepted: {
+                        DeviceConfigurator.disconnectFromBroker()
+                        DeviceConfigurator.setMqttBroker(editText, 1883)
+                        DeviceConfigurator.connectToBroker()
+                    }
+
+                    onActivated: {
+                        DeviceConfigurator.disconnectFromBroker()
+                        DeviceConfigurator.setMqttBroker(model[index], 1883)
+                        DeviceConfigurator.connectToBroker()
+                    }
+                }
+            }
+        }
+
+        // =======================
+        // Language Settings Group
+        // =======================
+        GroupBox {
+            title: "Language Settings"
+            Layout.fillWidth: true
+
+            ColumnLayout {
+                spacing: 10
+                Layout.fillWidth: true
+
+                Label {
+                    text: "Select Language:"
+                }
+
+                ComboBox {
+                    id: languageCombo
+                    Layout.fillWidth: true
+                    model: ["English","Chichewa"]
+
+                    currentIndex: InfarenceRunner.currentLanguage() === "ny" ? 1 : 0
+
+                    onActivated: {
+                        InfarenceRunner.setLanguage(index === 0 ? "en" : "ny")
+                    }
                 }
             }
         }
@@ -55,6 +90,7 @@ Page {
         title: "Broker Status"
         modal: true
         standardButtons: Dialog.Ok
+        anchors.centerIn: parent
 
         Label {
             anchors.centerIn: parent
@@ -63,15 +99,13 @@ Page {
             color: "#333"
             font.weight: Font.Medium
         }
-
-        anchors.centerIn: parent
     }
 
     // Property for dialog message
     property string brokerDialogMessage: ""
 
     // =======================
-    // Connections to device configurator signals
+    // Connections
     // =======================
     Connections {
         target: DeviceConfigurator
@@ -82,7 +116,7 @@ Page {
         }
 
         function onBrokerDisconnected() {
-            brokerDialogMessage = "Broker Disconneted"
+            brokerDialogMessage = "Broker Disconnected"
             brokerDialog.open()
         }
 

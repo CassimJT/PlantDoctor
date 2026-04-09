@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 
     // Device Management
     PNDDeviceConfigurator deviceConfigurator;
-    deviceConfigurator.setMqttBroker("192.168.8.130", 1883);
+    deviceConfigurator.setMqttBroker("192.168.8.149", 1883);
     // deviceConfigurator.setMqttCredentials("username", "password");
 
     PNDDeviceModel* deviceModel = deviceConfigurator.deviceModel();
