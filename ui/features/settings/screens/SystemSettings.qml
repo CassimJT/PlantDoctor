@@ -33,9 +33,9 @@ Page {
 
                 ComboBox {
                     id: brokerCombo
-                    Layout.fillWidth: true
+                    Layout.preferredWidth: 150
                     editable: true
-                    model: ["192.168.8.149", "192.168.8.130"]
+                    model: ["192.168.8.130"]
 
                     onAccepted: {
                         DeviceConfigurator.disconnectFromBroker()

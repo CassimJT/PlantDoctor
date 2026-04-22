@@ -14,6 +14,7 @@
 #include "src/core/mqtt/pnddevicemodel.h"
 #include "src/core/mqtt/pnddevicestate.h"
 #include "src/core/mqtt/pnddevice.h"
+#include "src/core/synch/apiclient.h"
 
 int main(int argc, char *argv[])
 {
@@ -30,7 +31,7 @@ int main(int argc, char *argv[])
 
     // Device Management
     PNDDeviceConfigurator deviceConfigurator;
-    deviceConfigurator.setMqttBroker("192.168.8.149", 1883);
+    deviceConfigurator.setMqttBroker("192.168.8.130", 1883);
     // deviceConfigurator.setMqttCredentials("username", "password");
 
     PNDDeviceModel* deviceModel = deviceConfigurator.deviceModel();
@@ -39,6 +40,9 @@ int main(int argc, char *argv[])
     QString systemLang = QLocale::system().name().split("_").first();
     QString appLanguage = (systemLang == "ny" || systemLang == "mw") ? "ny" : "en";
     DiseaseInfoManager::instance().loadLanguage(appLanguage);
+
+    //ApiClient
+    APIClient apiClient;
 
     // QML Engine
     QQmlApplicationEngine engine;
@@ -49,6 +53,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("CurrentLanguage", appLanguage);
     engine.rootContext()->setContextProperty("DeviceConfigurator", &deviceConfigurator);
     engine.rootContext()->setContextProperty("DeviceModel", deviceModel);
+    engine.rootContext()->setContextProperty("APIClient", &apiClient);
+
 
     // Register enum for QML
     qmlRegisterUncreatableType<PNDDeviceState>(

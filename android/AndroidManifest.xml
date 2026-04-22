@@ -1,21 +1,106 @@
 <?xml version="1.0"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.qtproject.PlantDoctor" android:installLocation="auto" android:versionCode="1" android:versionName="mvp">
-    <!-- %%INSERT_PERMISSIONS -->
-     <uses-permission android:name="android.permission.CAMERA"/>
-    <!-- %%INSERT_FEATURES -->
-    <supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:smallScreens="true"/>
-    <application android:theme="@style/QtAppTheme" android:name="org.qtproject.qt.android.bindings.QtApplication" android:hardwareAccelerated="true" android:label="PlantDoctor" android:requestLegacyExternalStorage="true" android:allowBackup="true" android:fullBackupOnly="false" android:icon="@drawable/icon">
-        <activity  android:theme="@style/QtAppTheme" android:name="org.qtproject.qt.android.bindings.QtActivity" android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:label="PlantDoctor" android:launchMode="singleTop" android:screenOrientation="unspecified" android:exported="true">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.plantdoctor"
+    android:installLocation="auto"
+    android:versionCode="1"
+    android:versionName="mvp">
+
+    <!-- ========================= -->
+    <!-- PERMISSIONS -->
+    <!-- ========================= -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+
+    <!-- ========================= -->
+    <!-- SCREEN SUPPORT -->
+    <!-- ========================= -->
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"/>
+
+    <!-- ========================= -->
+    <!-- APPLICATION -->
+    <!-- ========================= -->
+    <application
+        android:name="org.qtproject.qt.android.bindings.QtApplication"
+        android:label="PlantDoctor"
+        android:icon="@drawable/icon"
+        android:theme="@style/QtAppTheme"
+        android:hardwareAccelerated="true"
+        android:requestLegacyExternalStorage="true"
+        android:allowBackup="true"
+        android:fullBackupOnly="false">
+
+        <!-- ========================= -->
+        <!-- MAIN QT ACTIVITY -->
+        <!-- ========================= -->
+        <activity
+            android:name="org.qtproject.qt.android.bindings.QtActivity"
+            android:label="PlantDoctor"
+            android:theme="@style/QtAppTheme"
+            android:launchMode="singleTop"
+            android:screenOrientation="unspecified"
+            android:exported="true"
+            android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!-- Qt required metadata -->
             <meta-data android:name="android.app.lib_name" android:value="-- %%INSERT_APP_LIB_NAME%% --"/>
             <meta-data android:name="android.app.arguments" android:value="-- %%INSERT_APP_ARGUMENTS%% --"/>
         </activity>
 
-        <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.qtprovider" android:exported="false" android:grantUriPermissions="true">
-            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/qtprovider_paths"/>
+        <!-- ========================= -->
+        <!-- ALARM RECEIVER -->
+        <!-- ========================= -->
+        <receiver
+            android:name="com.plantdoctor.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true">
+
+            <!-- Custom alarm trigger -->
+            <intent-filter>
+                <action android:name="com.plantdoctor.ALARM_TRIGGERED"/>
+            </intent-filter>
+
+            <!-- Device reboot -->
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- ========================= -->
+        <!-- FOREGROUND SERVICE -->
+        <!-- ========================= -->
+        <service
+            android:name="com.plantdoctor.AlarmService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <!-- ========================= -->
+        <!-- FILE PROVIDER -->
+        <!-- ========================= -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.qtprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/qtprovider_paths"/>
         </provider>
+
     </application>
 </manifest>
+

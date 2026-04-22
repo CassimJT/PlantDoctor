@@ -101,6 +101,7 @@ qt_add_qml_module(appPlantDoctor
         src/core/rtsp/rtsvideooutput.cpp
         QML_FILES ui/features/home/screens/ImagePreviewScreen.qml
         SOURCES src/core/synch/apiclient.h src/core/synch/apiclient.cpp
+        SOURCES src/core/synch/apiclient.h src/core/synch/apiclient.cpp
 
 
 
