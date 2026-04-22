@@ -5,57 +5,87 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QJsonObject>
-#include <QSslError>
+#include <QJsonArray>
+#include <functional>
+#include <QMap>
 
-class ApiClient : public QObject
+class APIClient : public QObject
 {
     Q_OBJECT
+
+    Q_PROPERTY(QString baseUrl READ baseUrl WRITE setBaseUrl NOTIFY baseUrlChanged)
+    Q_PROPERTY(QString authToken READ authToken WRITE setAuthToken NOTIFY authTokenChanged)
+    Q_PROPERTY(bool isloading READ isloading WRITE setIsloading NOTIFY isloadingChanged FINAL)
+
 public:
-    explicit ApiClient(QObject *parent = nullptr);
-    ~ApiClient();
+    explicit APIClient(QObject *parent = nullptr);
+    ~APIClient();
+    // Properties
+    QString baseUrl() const { return m_baseUrl; }
+    void setBaseUrl(const QString &url);
 
-    // Auth endpoints
-    void registerUser(const QString &email, const QString &password, const QString &name);
-    void login(const QString &email, const QString &password);
-    void logout();
+    QString authToken() const { return m_authToken; }
+    void setAuthToken(const QString &token);
 
-    // Inference endpoints
-    void uploadInference(const QJsonObject &inferenceData);
+    // ===== EXISTING (keep for C++ use) =====
+    void createInference(const QString &location, const QString &diseaseName,
+                         double confidence, const QString &variety,
+                         std::function<void(bool, const QJsonObject&)> callback);
 
-    // Token management
-    void setAccessToken(const QString &token);
-    void setRefreshToken(const QString &token);
-    QString getAccessToken() const;
-    QString getRefreshToken() const;
+    void listInferences(std::function<void(bool, const QJsonArray&)> callback);
+
+    void getInference(const QString &inferenceId,
+                      std::function<void(bool, const QJsonObject&)> callback);
+
+    // ===== NEW: QML-FRIENDLY API =====
+    Q_INVOKABLE void createInferenceQml(const QString &location,
+                                        const QString &diseaseName,
+                                        double confidence,
+                                        const QString &variety);
+
+    Q_INVOKABLE void listInferencesQml();
+
+    Q_INVOKABLE void getInferenceQml(const QString &inferenceId);
+
+    bool isloading() const;
+    void setIsloading(bool newIsloading);
 
 signals:
-    // Success signals
-    void registerSuccess(const QJsonObject &response);
-    void loginSuccess(const QJsonObject &response);
-    void logoutSuccess();
-    void uploadInferenceSuccess(const QJsonObject &response);
+    void baseUrlChanged();
+    void authTokenChanged();
 
-    // Error signals
-    void errorOccurred(const QString &errorString, int statusCode = 0);
-    void networkError(const QString &errorString);
+    void networkError(const QString &error);
+    void authenticationRequired();
 
-    // Token expired signal
-    void tokenExpired();
+    // ===== NEW: RESULT SIGNALS =====
+    void createInferenceFinished(bool success, QJsonObject response);
+    void listInferencesFinished(bool success, QJsonArray response);
+    void getInferenceFinished(bool success, QJsonObject response);
+
+    void isloadingChanged();
 
 private slots:
     void onReplyFinished(QNetworkReply *reply);
-    void onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
 
 private:
-    QNetworkAccessManager *m_networkManager;
+    QNetworkAccessManager *m_nam;
     QString m_baseUrl;
-    QString m_accessToken;
-    QString m_refreshToken;
+    QString m_authToken;
+    bool m_isloading;
 
-    // Helper methods
-    QNetworkRequest createRequest(const QString &endpoint, bool requireAuth = false);
-    void handleAuthError();
-    void saveTokens(const QJsonObject &response);
+    struct PendingRequest {
+        std::function<void(bool, const QJsonObject&)> objectCallback;
+        std::function<void(bool, const QJsonArray&)> arrayCallback;
+    };
+
+    QMap<QNetworkReply*, PendingRequest> m_pendingRequests;
+
+    void sendRequest(const QString &method, const QString &endpoint,
+                     const QJsonObject &data = QJsonObject(),
+                     std::function<void(bool, const QJsonObject&)> objectCallback = nullptr,
+                     std::function<void(bool, const QJsonArray&)> arrayCallback = nullptr);
+
+    void setupRequestHeaders(QNetworkRequest &request);
 };
 
-#endif // APICLIENT_H
+#endif

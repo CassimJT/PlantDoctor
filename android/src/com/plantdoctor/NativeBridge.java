@@ -6,7 +6,7 @@ public class NativeBridge {
 
     static {
         try {
-            System.loadLibrary("appSalesMate_armeabi-v7a");
+            System.loadLibrary("appPlantDoctor_armeabi-v7a");
             isInitialized = true;
             Log.d("NativeBridge", "Library loaded successfully");
         } catch (UnsatisfiedLinkError e) {

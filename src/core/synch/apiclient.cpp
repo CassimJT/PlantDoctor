@@ -1,210 +1,203 @@
 #include "apiclient.h"
-#include <QUrl>
-#include <QUrlQuery>
-#include <QJsonDocument>
-#include <QJsonParseError>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QSslError>
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QUrl>
 #include <QDebug>
 
-ApiClient::ApiClient(QObject *parent)
+APIClient::APIClient(QObject *parent)
     : QObject(parent)
-    , m_networkManager(new QNetworkAccessManager(this))
-    , m_baseUrl("http://localhost:3000/api") // Change to your actual API URL
+    , m_nam(new QNetworkAccessManager(this))
+    , m_baseUrl("http://localhost:5000/api/inferences")
+    ,m_isloading(false)
 {
-    connect(m_networkManager, &QNetworkAccessManager::finished,
-            this, &ApiClient::onReplyFinished);
-
-    // Connect SSL error handling
-    connect(m_networkManager, &QNetworkAccessManager::sslErrors,
-            this, &ApiClient::onSslErrors);
+    connect(m_nam, &QNetworkAccessManager::finished, this, &APIClient::onReplyFinished);
 }
 
-ApiClient::~ApiClient()
+APIClient::~APIClient()
 {
 }
 
-void ApiClient::registerUser(const QString &email, const QString &password, const QString &name)
+void APIClient::setBaseUrl(const QString &url)
 {
-    QNetworkRequest request = createRequest("/auth/register", false);
+    if (m_baseUrl != url) {
+        m_baseUrl = url;
+        emit baseUrlChanged();
+    }
+}
+
+void APIClient::setAuthToken(const QString &token)
+{
+    if (m_authToken != token) {
+        m_authToken = token;
+        emit authTokenChanged();
+    }
+}
+
+void APIClient::createInference(const QString &location, const QString &diseaseName,
+                                double confidence, const QString &variety,
+                                std::function<void(bool, const QJsonObject&)> callback)
+{
+    QJsonObject data;
+    data["location"] = location;
+    data["diseasname"] = diseaseName;
+    data["confidence"] = confidence;
+    data["variaty"] = variety;
+
+    sendRequest("POST", "", data, callback);
+}
+
+void APIClient::listInferences(std::function<void(bool, const QJsonArray&)> callback)
+{
+    sendRequest("GET", "", QJsonObject(), nullptr, callback);
+}
+
+void APIClient::getInference(const QString &inferenceId,
+                             std::function<void(bool, const QJsonObject&)> callback)
+{
+    sendRequest("GET", "/" + inferenceId, QJsonObject(), callback);
+}
+
+void APIClient::sendRequest(const QString &method, const QString &endpoint,
+                            const QJsonObject &data,
+                            std::function<void(bool, const QJsonObject&)> objectCallback,
+                            std::function<void(bool, const QJsonArray&)> arrayCallback)
+{
+    QUrl url(m_baseUrl + endpoint);
+    QNetworkRequest request(url);
+    setupRequestHeaders(request);
+
+    QNetworkReply *reply = nullptr;
+
+    if (method == "GET") {
+        reply = m_nam->get(request);
+    } else if (method == "POST") {
+        QJsonDocument doc(data);
+        QByteArray jsonData = doc.toJson();
+        reply = m_nam->post(request, jsonData);
+    } else if (method == "PUT") {
+        QJsonDocument doc(data);
+        QByteArray jsonData = doc.toJson();
+        reply = m_nam->put(request, jsonData);
+    } else if (method == "DELETE") {
+        reply = m_nam->deleteResource(request);
+    }
+
+    if (reply) {
+        PendingRequest pending;
+        pending.objectCallback = objectCallback;
+        pending.arrayCallback = arrayCallback;
+        m_pendingRequests[reply] = pending;
+    }
+}
+
+void APIClient::setupRequestHeaders(QNetworkRequest &request)
+{
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QJsonObject json;
-    json["email"] = email;
-    json["password"] = password;
-    json["name"] = name;
-
-    QJsonDocument doc(json);
-    QByteArray data = doc.toJson();
-
-    m_networkManager->post(request, data);
+    if (!m_authToken.isEmpty()) {
+        request.setRawHeader("Authorization", QString("Bearer %1").arg(m_authToken).toUtf8());
+    }
 }
 
-void ApiClient::login(const QString &email, const QString &password)
+void APIClient::onReplyFinished(QNetworkReply *reply)
 {
-    QNetworkRequest request = createRequest("/auth/login", false);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-
-    QJsonObject json;
-    json["email"] = email;
-    json["password"] = password;
-
-    QJsonDocument doc(json);
-    QByteArray data = doc.toJson();
-
-    m_networkManager->post(request, data);
-}
-
-void ApiClient::logout()
-{
-    if (m_accessToken.isEmpty()) {
-        emit errorOccurred("No access token available");
+    if (!m_pendingRequests.contains(reply)) {
+        reply->deleteLater();
         return;
     }
 
-    QNetworkRequest request = createRequest("/auth/logout", true);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    PendingRequest pending = m_pendingRequests.take(reply);
+    bool success = (reply->error() == QNetworkReply::NoError);
 
-    QJsonObject json;
-    json["refreshToken"] = m_refreshToken;
+    if (!success) {
+        emit networkError(reply->errorString());
 
-    QJsonDocument doc(json);
-    QByteArray data = doc.toJson();
+        // Handle authentication errors
+        if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 401) {
+            emit authenticationRequired();
+        }
 
-    m_networkManager->post(request, data);
-}
+        if (pending.objectCallback) {
+            pending.objectCallback(false, QJsonObject());
+        } else if (pending.arrayCallback) {
+            pending.arrayCallback(false, QJsonArray());
+        }
+        reply->deleteLater();
+        return;
+    }
 
-void ApiClient::uploadInference(const QJsonObject &inferenceData)
-{
-    // No authentication required for upload inference
-    QNetworkRequest request = createRequest("/inference", false);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-
-    QJsonDocument doc(inferenceData);
-    QByteArray data = doc.toJson();
-
-    m_networkManager->post(request, data);
-}
-
-void ApiClient::setAccessToken(const QString &token)
-{
-    m_accessToken = token;
-}
-
-void ApiClient::setRefreshToken(const QString &token)
-{
-    m_refreshToken = token;
-}
-
-QString ApiClient::getAccessToken() const
-{
-    return m_accessToken;
-}
-
-QString ApiClient::getRefreshToken() const
-{
-    return m_refreshToken;
-}
-
-void ApiClient::onReplyFinished(QNetworkReply *reply)
-{
-    if (!reply) return;
-
-    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     QByteArray responseData = reply->readAll();
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(responseData, &parseError);
 
-    QString endpoint = reply->url().toString();
-
-    if (reply->error() == QNetworkReply::NoError) {
-        // Success handling
-        if (endpoint.contains("/auth/register")) {
-            QJsonObject response = doc.object();
-            emit registerSuccess(response);
+    if (parseError.error != QJsonParseError::NoError) {
+        emit networkError("JSON Parse Error: " + parseError.errorString());
+        if (pending.objectCallback) {
+            pending.objectCallback(false, QJsonObject());
+        } else if (pending.arrayCallback) {
+            pending.arrayCallback(false, QJsonArray());
         }
-        else if (endpoint.contains("/auth/login")) {
-            QJsonObject response = doc.object();
-            saveTokens(response);
-            emit loginSuccess(response);
-        }
-        else if (endpoint.contains("/auth/logout")) {
-            m_accessToken.clear();
-            m_refreshToken.clear();
-            emit logoutSuccess();
-        }
-        else if (endpoint.contains("/inference")) {
-            QJsonObject response = doc.object();
-            emit uploadInferenceSuccess(response);
-        }
+        reply->deleteLater();
+        return;
     }
-    else {
-        // Error handling
-        QString errorMessage;
-        if (parseError.error == QJsonParseError::NoError && doc.isObject()) {
-            QJsonObject errorObj = doc.object();
-            errorMessage = errorObj["message"].toString();
-            if (errorMessage.isEmpty()) {
-                errorMessage = errorObj["error"].toString();
-            }
-        }
 
-        if (errorMessage.isEmpty()) {
-            errorMessage = reply->errorString();
-        }
-
-        // Handle token expiration (401 Unauthorized) - only for auth endpoints
-        if (statusCode == 401 && (endpoint.contains("/auth/logout"))) {
-            handleAuthError();
-        }
-
-        emit errorOccurred(errorMessage, statusCode);
+    if (pending.objectCallback) {
+        pending.objectCallback(true, doc.object());
+    } else if (pending.arrayCallback) {
+        pending.arrayCallback(true, doc.array());
     }
 
     reply->deleteLater();
 }
 
-void ApiClient::onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
+bool APIClient::isloading() const
 {
-    // For development only - ignore SSL errors
-    // In production, you should handle this properly
-    qWarning() << "SSL Errors occurred:" << errors;
-
-    // Optionally, you can ignore SSL errors for development
-    // reply->ignoreSslErrors();
-
-    // Emit network error with details
-    if (!errors.isEmpty()) {
-        emit networkError("SSL Error: " + errors.first().errorString());
-    }
+    return m_isloading;
 }
 
-QNetworkRequest ApiClient::createRequest(const QString &endpoint, bool requireAuth)
+void APIClient::setIsloading(bool newIsloading)
 {
-    QUrl url(m_baseUrl + endpoint);
-    QNetworkRequest request(url);
+    if (m_isloading == newIsloading)
+        return;
+    m_isloading = newIsloading;
+    emit isloadingChanged();
+}
+// ===== QML WRAPPERS =====
 
-    if (requireAuth && !m_accessToken.isEmpty()) {
-        request.setRawHeader("Authorization", QString("Bearer %1").arg(m_accessToken).toUtf8());
-    }
-
-    return request;
+void APIClient::createInferenceQml(const QString &location,
+                                   const QString &diseaseName,
+                                   double confidence,
+                                   const QString &variety)
+{
+    setIsloading(true);
+    createInference(location, diseaseName, confidence, variety,
+                    [this](bool success, const QJsonObject &response) {
+                        emit createInferenceFinished(success, response);
+                        setIsloading(false);
+                    }
+                    );
 }
 
-void ApiClient::handleAuthError()
+void APIClient::listInferencesQml()
 {
-    // Token expired or invalid
-    m_accessToken.clear();
-    emit tokenExpired();
+    setIsloading(true);
+    listInferences(
+        [this](bool success, const QJsonArray &response) {
+            emit listInferencesFinished(success, response);
+            setIsloading(true);
+        }
+        );
 }
 
-void ApiClient::saveTokens(const QJsonObject &response)
+void APIClient::getInferenceQml(const QString &inferenceId)
 {
-    if (response.contains("accessToken")) {
-        m_accessToken = response["accessToken"].toString();
-    }
-    if (response.contains("refreshToken")) {
-        m_refreshToken = response["refreshToken"].toString();
-    }
+    setIsloading(true);
+    getInference(inferenceId,
+                 [this](bool success, const QJsonObject &response) {
+                     emit getInferenceFinished(success, response);
+                     setIsloading(true);
+                 }
+                 );
 }
