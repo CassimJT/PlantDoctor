@@ -29,8 +29,8 @@ Page {
                 Layout.fillWidth: true
                 height: 170
                 radius: 10
-                color: "#1a1d27"
-                border.color: "#2a2d3a"
+                color: "#edf2e0"
+                border.color: "black"
                 border.width: 1
 
                 DHTMeter {
@@ -38,13 +38,13 @@ Page {
                 }
             }
 
-            // Right card — Live Monitor (image + tap to navigate)
+            // Right card — Live Monitor
             Rectangle {
                 Layout.fillWidth: true
                 height: 170
                 radius: 10
-                color: "#1a1d27"
-                border.color: "#2a2d3a"
+                color: "#edf2e0"
+                border.color: "black"
                 border.width: 1
                 clip: true
 
@@ -52,7 +52,7 @@ Page {
                     anchors.centerIn: parent
                     width: parent.width - 16
                     height: parent.height - 16
-                    source: "qrc:/assets/appbar/pest.svg"  // ← update to your image path
+                    source: "qrc:/assets/appbar/pest.svg"
                     fillMode: Image.PreserveAspectFit
                     opacity: liveMonitorArea.containsMouse ? 0.7 : 1.0
 
@@ -68,7 +68,7 @@ Page {
                         bottomMargin: 8
                     }
                     text: "Live Monitor"
-                    color: "#2a2d3a"
+                    color: "black"
                     font.pixelSize: 11
                     font.bold: true
                     opacity: 0.8
@@ -79,10 +79,8 @@ Page {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked:{
-
+                    onClicked: {
                         mainStackView?.push("LiveMonitorScreen.qml")
-
                     }
                 }
             }
@@ -97,8 +95,8 @@ Page {
                 Layout.fillWidth: true
                 height: 170
                 radius: 10
-                color: "#1a1d27"
-                border.color: "#2a2d3a"
+                color: "#edf2e0"
+                border.color: "black"
                 border.width: 1
             }
 
@@ -106,8 +104,8 @@ Page {
                 Layout.fillWidth: true
                 height: 170
                 radius: 10
-                color: "#1a1d27"
-                border.color: "#2a2d3a"
+                color: "#edf2e0"
+                border.color: "black"
                 border.width: 1
             }
         }
