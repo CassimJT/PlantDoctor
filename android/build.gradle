@@ -87,7 +87,7 @@ android {
 
     packagingOptions {
         jniLibs {
-            useLegacyPackaging = legacyPackaging
+            //useLegacyPackaging = legacyPackaging
         }
     }
 
