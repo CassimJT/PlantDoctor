@@ -99,7 +99,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.plantdoctor");
             if (launchIntent == null) {
                 Log.e(TAG, "Failed to get launch intent for com.plantdoctor");
-                showOpenAppNotification(context); //ask the user to manually launch it
+                showOpenAppNotification(context);
                 return;
             }
             launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -179,16 +179,16 @@ public class AlarmReceiver extends BroadcastReceiver {
         Intent notificationIntent = context.getPackageManager().getLaunchIntentForPackage("com.plantdoctor");
         if (notificationIntent != null) {
             notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 
-                PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0));
+            int pendingIntentFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                pendingIntentFlags |= PendingIntent.FLAG_IMMUTABLE;
+            }
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, pendingIntentFlags);
 
-            // Use Android system icon instead of custom one
-            int iconId = android.R.drawable.ic_dialog_info;
-            
             Notification notification = new NotificationCompat.Builder(context, "alarm_notification_channel")
                 .setContentTitle("PlantDoctor Alarm")
                 .setContentText("Please open the app to process the alarm")
-                .setSmallIcon(iconId)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
@@ -211,9 +211,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         if (manager == null) return false;
 
-        // Suppress deprecation warning - this is still the only way on older APIs
-        List<ActivityManager.RunningServiceInfo> services = manager.getRunningServices(Integer.MAX_VALUE);
-        for (ActivityManager.RunningServiceInfo service : services) {
+        // The @SuppressWarnings("deprecation") annotation above suppresses the warning
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (AlarmService.class.getName().equals(service.service.getClassName())) {
                 return true;
             }

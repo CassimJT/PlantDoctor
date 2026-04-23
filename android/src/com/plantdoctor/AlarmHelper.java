@@ -6,129 +6,107 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
-
 import java.util.Calendar;
 
 public class AlarmHelper {
-
     private static final String TAG = "AlarmHelper";
     private static final int REQUEST_CODE = 1000;
 
-    public static final String ACTION_ALARM = "com.plantdoctor.ALARM_TRIGGERED";
-
-    // =========================
-    // PUBLIC API
-    // =========================
     public static void scheduleExactAlarm(Context context) {
-        AlarmManager alarmManager = getAlarmManager(context);
-        if (alarmManager == null) return;
-
-        if (!canScheduleExactAlarm(context, alarmManager)) return;
-
-        PendingIntent pi = buildPendingIntent(context, PendingIntent.FLAG_UPDATE_CURRENT);
-        if (pi == null) return;
-
-        long triggerAt = computeNextSunday9PM();
-        Log.d(TAG, "Scheduling alarm at: " + triggerAt);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerAt,
-                    pi
-            );
-        } else {
-            alarmManager.setExact(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerAt,
-                    pi
-            );
-        }
-
-        Log.d(TAG, "Alarm scheduled successfully");
-    }
-
-    public static void cancelAlarm(Context context) {
-        AlarmManager alarmManager = getAlarmManager(context);
-        if (alarmManager == null) return;
-
-        PendingIntent pi = buildPendingIntent(context, PendingIntent.FLAG_NO_CREATE);
-        if (pi != null) {
-            alarmManager.cancel(pi);
-            pi.cancel();
-            Log.d(TAG, "Alarm cancelled");
-        } else {
-            Log.d(TAG, "No existing alarm to cancel");
-        }
-    }
-
-    // =========================
-    // INTERNAL HELPERS
-    // =========================
-    private static AlarmManager getAlarmManager(Context context) {
-        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        if (am == null) {
-            Log.e(TAG, "AlarmManager is null");
-        }
-        return am;
-    }
-
-    private static boolean canScheduleExactAlarm(Context context, AlarmManager am) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (!am.canScheduleExactAlarms()) {
-                Log.w(TAG, "Exact alarm permission missing");
-
-                Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                try {
-                    context.startActivity(intent);
-                } catch (Exception e) {
-                    Log.e(TAG, "Failed to open exact alarm settings", e);
-                }
-                return false;
+        try {
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            if (alarmManager == null) {
+                Log.e(TAG, "AlarmManager is null");
+                return;
             }
-        }
-        return true;
-    }
 
-    private static PendingIntent buildPendingIntent(Context context, int baseFlag) {
-        Intent intent = new Intent(context, AlarmReceiver.class);
-        intent.setAction(ACTION_ALARM);
-        intent.putExtra("source", "qt_android");
+            // Check for SCHEDULE_EXACT_ALARM permission on Android 12+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (!alarmManager.canScheduleExactAlarms()) {
+                    Log.e(TAG, "Cannot schedule exact alarms - prompting user");
+                    Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    try {
+                        context.startActivity(intent);
+                        Log.d(TAG, "Prompted user for SCHEDULE_EXACT_ALARM permission");
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to prompt for SCHEDULE_EXACT_ALARM", e);
+                    }
+                    return;
+                }
+            }
 
-        int flags = baseFlag;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            flags |= PendingIntent.FLAG_IMMUTABLE;
-        }
+            Intent intent = new Intent(context, AlarmReceiver.class);
+            intent.setAction("com.plantdoctor.ALARM_TRIGGERED");
+            intent.putExtra("source", "qt_android");
 
-        return PendingIntent.getBroadcast(
+            int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                flags |= PendingIntent.FLAG_IMMUTABLE;
+            }
+
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
                 REQUEST_CODE,
                 intent,
                 flags
-        );
+            );
+
+            // Calculate next Sunday at 9:00 PM
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.set(Calendar.HOUR_OF_DAY, 21); // 9:00 PM
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+
+            // Set to next Sunday
+            int currentDay = calendar.get(Calendar.DAY_OF_WEEK);
+            int daysUntilSunday = (Calendar.SUNDAY - currentDay + 7) % 7;
+            if (daysUntilSunday == 0 && calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+                // If today is Sunday and time has passed 9:00 PM, schedule for next Sunday
+                daysUntilSunday = 7;
+            }
+            calendar.add(Calendar.DAY_OF_YEAR, daysUntilSunday);
+
+            long triggerAt = calendar.getTimeInMillis();
+            Log.d(TAG, "Scheduling alarm for: " + calendar.getTime());
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    pendingIntent
+                );
+            } else {
+                alarmManager.setExact(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    pendingIntent
+                );
+            }
+            Log.d(TAG, "Alarm scheduled successfully");
+        } catch (Exception e) {
+            Log.e(TAG, "Alarm scheduling failed", e);
+        }
     }
 
-    private static long computeNextSunday9PM() {
-        Calendar now = Calendar.getInstance();
-        Calendar target = Calendar.getInstance();
-
-        target.set(Calendar.HOUR_OF_DAY, 21);
-        target.set(Calendar.MINUTE, 0);
-        target.set(Calendar.SECOND, 0);
-        target.set(Calendar.MILLISECOND, 0);
-
-        int currentDay = now.get(Calendar.DAY_OF_WEEK);
-        int daysUntilSunday = (Calendar.SUNDAY - currentDay + 7) % 7;
-
-        if (daysUntilSunday == 0 && target.before(now)) {
-            daysUntilSunday = 7;
+    public static void cancelAlarm(Context context) {
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        int flags = PendingIntent.FLAG_NO_CREATE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            flags |= PendingIntent.FLAG_IMMUTABLE;
         }
 
-        target.add(Calendar.DAY_OF_YEAR, daysUntilSunday);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+            context, REQUEST_CODE, intent, flags
+        );
 
-        return target.getTimeInMillis();
+        if (pendingIntent != null) {
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(pendingIntent);
+            pendingIntent.cancel();
+            Log.d(TAG, "Alarm canceled");
+        }
     }
 }
-

@@ -15,6 +15,7 @@
 #include "src/core/mqtt/pnddevicestate.h"
 #include "src/core/mqtt/pnddevice.h"
 #include "src/core/synch/apiclient.h"
+#include "src/core/synch/cloudsynch.h"
 
 int main(int argc, char *argv[])
 {
@@ -44,6 +45,9 @@ int main(int argc, char *argv[])
     //ApiClient
     APIClient apiClient;
 
+    //cloudSynch
+    CloudSynch cloudSynch;
+
     // QML Engine
     QQmlApplicationEngine engine;
 
@@ -54,6 +58,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("DeviceConfigurator", &deviceConfigurator);
     engine.rootContext()->setContextProperty("DeviceModel", deviceModel);
     engine.rootContext()->setContextProperty("APIClient", &apiClient);
+    engine.rootContext()->setContextProperty("CloudSynch", &cloudSynch);
 
 
     // Register enum for QML
