@@ -86,33 +86,31 @@ Page {
             }
         }
 
-        RowLayout {
-            Layout.fillWidth: true
-            height: 170
-            spacing: 10
+        // Bottom row — full width card with CircularProgressBar
+                RowLayout {
+                    Layout.fillWidth: true
+                    height: 170
+                    spacing: 10
 
-            Rectangle {
-                Layout.fillWidth: true
-                height: 170
-                radius: 10
-                color: "#edf2e0"
-                border.color: "black"
-                border.width: 1
-            }
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 170
+                        radius: 10
+                        color: "#edf2e0"
+                        border.color: "black"
+                        border.width: 1
 
-            Rectangle {
-                Layout.fillWidth: true
-                height: 170
-                radius: 10
-                color: "#edf2e0"
-                border.color: "black"
-                border.width: 1
+                        CircularProgressBar {
+                            anchors.centerIn: parent
+                            width: 140
+                            height: 140
+                        }
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
             }
         }
-
-        Item {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-        }
-    }
-}
