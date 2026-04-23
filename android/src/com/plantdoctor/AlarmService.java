@@ -12,16 +12,15 @@ import androidx.core.app.NotificationCompat;
 import android.util.Log;
 
 public class AlarmService extends Service {
+    private static final String TAG = "AlarmService";
     private static boolean isRunning = false;
     private static final int NOTIFICATION_ID = 123;
     private static final String CHANNEL_ID = "alarm_service_channel";
-    private static final String TAG = "AlarmService";
 
     @Override
     public void onCreate() {
         super.onCreate();
         isRunning = true;
-        Log.d(TAG, "AlarmService created");
         startForegroundNotification();
     }
 
@@ -35,19 +34,13 @@ public class AlarmService extends Service {
 
     private void startForegroundNotification() {
         createNotificationChannel();
-        
-        // Use Android system icon instead of custom R.drawable.icon
-        int iconId = android.R.drawable.ic_dialog_info; // or ic_notification, ic_dialog_alert
-        
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("PlantDoctor Alarm")
             .setContentText("Processing alarms in background")
-            .setSmallIcon(iconId)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build();
-            
         startForeground(NOTIFICATION_ID, notification);
-        Log.d(TAG, "Foreground notification started");
     }
 
     private void createNotificationChannel() {
@@ -57,11 +50,9 @@ public class AlarmService extends Service {
                 "Alarm Service",
                 NotificationManager.IMPORTANCE_LOW
             );
-            
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(channel);
-                Log.d(TAG, "Notification channel created");
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
             }
         }
     }

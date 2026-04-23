@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.plantdoctor"
     android:installLocation="auto"
     android:versionCode="1"
@@ -13,7 +14,17 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+
+    <!-- Additional permissions for better reliability -->
+    <uses-permission android:name="com.huawei.permission.external_app_settings.USE_COMPONENT"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTION" tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.GET_RUNNING_SERVICES" tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:ignore="ProtectedPermissions"/>
 
     <!-- ========================= -->
     <!-- SCREEN SUPPORT -->
@@ -47,11 +58,19 @@
             android:launchMode="singleTop"
             android:screenOrientation="unspecified"
             android:exported="true"
+            android:clearTaskOnLaunch="false"
+            android:alwaysRetainTaskState="true"
             android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+            <!-- Add this to handle restore from background -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
 
             <!-- Qt required metadata -->
@@ -63,17 +82,12 @@
         <!-- ALARM RECEIVER -->
         <!-- ========================= -->
         <receiver
-            android:name="com.plantdoctor.AlarmReceiver"
+            android:name=".AlarmReceiver"
             android:enabled="true"
             android:exported="true">
 
-            <!-- Custom alarm trigger -->
             <intent-filter>
                 <action android:name="com.plantdoctor.ALARM_TRIGGERED"/>
-            </intent-filter>
-
-            <!-- Device reboot -->
-            <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
@@ -82,10 +96,15 @@
         <!-- FOREGROUND SERVICE -->
         <!-- ========================= -->
         <service
-            android:name="com.plantdoctor.AlarmService"
+            android:name=".AlarmService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="dataSync" />
+            android:stopWithTask="false"
+            android:foregroundServiceType="dataSync|specialUse">
+            <property
+                android:name="android.foreground_service_type_special_use"
+                android:value="Alarm service for scheduled tasks"/>
+        </service>
 
         <!-- ========================= -->
         <!-- FILE PROVIDER -->
@@ -102,5 +121,5 @@
         </provider>
 
     </application>
-</manifest>
 
+</manifest>

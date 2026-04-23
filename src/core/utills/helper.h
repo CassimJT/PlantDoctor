@@ -56,6 +56,7 @@ private:
     QString m_localPath;
     bool isHompage;
     bool isCamera;
+    void requestIgnoreBatteryOptimization();
 
 
     Q_PROPERTY(bool isCamera READ getIsCamera WRITE setIsCamera NOTIFY isCameraChanged FINAL)
