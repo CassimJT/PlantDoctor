@@ -9,8 +9,8 @@
 APIClient::APIClient(QObject *parent)
     : QObject(parent)
     , m_nam(new QNetworkAccessManager(this))
-    , m_baseUrl("http://localhost:5000/api/inferences")
-    ,m_isloading(false)
+    , m_baseUrl("https://plantdoctor-api.onrender.com/api/inference")
+    , m_isloading(false)
 {
     connect(m_nam, &QNetworkAccessManager::finished, this, &APIClient::onReplyFinished);
 }
@@ -57,6 +57,16 @@ void APIClient::getInference(const QString &inferenceId,
                              std::function<void(bool, const QJsonObject&)> callback)
 {
     sendRequest("GET", "/" + inferenceId, QJsonObject(), callback);
+}
+
+void APIClient::createBatchInferences(const QJsonArray &inferencesArray,
+                                      std::function<void(bool, const QJsonObject&)> callback)
+{
+    QJsonObject data;
+    data["inferences"] = inferencesArray;
+    data["batchSize"] = inferencesArray.size();
+
+    sendRequest("POST", "/batch", data, callback);
 }
 
 void APIClient::sendRequest(const QString &method, const QString &endpoint,
@@ -164,6 +174,7 @@ void APIClient::setIsloading(bool newIsloading)
     m_isloading = newIsloading;
     emit isloadingChanged();
 }
+
 // ===== QML WRAPPERS =====
 
 void APIClient::createInferenceQml(const QString &location,
@@ -186,7 +197,7 @@ void APIClient::listInferencesQml()
     listInferences(
         [this](bool success, const QJsonArray &response) {
             emit listInferencesFinished(success, response);
-            setIsloading(true);
+            setIsloading(false);
         }
         );
 }
@@ -197,7 +208,115 @@ void APIClient::getInferenceQml(const QString &inferenceId)
     getInference(inferenceId,
                  [this](bool success, const QJsonObject &response) {
                      emit getInferenceFinished(success, response);
-                     setIsloading(true);
+                     setIsloading(false);
                  }
                  );
+}
+
+// ===== BATCH SYNC METHODS =====
+
+// Helper to convert QVariantList to QJsonArray
+QJsonArray APIClient::variantListToJsonArray(const QVariantList &list)
+{
+    QJsonArray jsonArray;
+
+    for (const QVariant &item : list) {
+        if (item.canConvert<QVariantMap>()) {
+            QVariantMap map = item.toMap();
+            QJsonObject obj;
+
+            // Extract the 4 fields
+            if (map.contains("diseaseName"))
+                obj["diseasname"] = map["diseaseName"].toString();
+            if (map.contains("confidence"))
+                obj["confidence"] = map["confidence"].toDouble();
+            if (map.contains("location"))
+                obj["location"] = map["location"].toString();
+            if (map.contains("variaty"))
+                obj["variaty"] = map["variaty"].toString();
+
+            // Alternative field names for flexibility
+            if (map.contains("disease_name"))
+                obj["diseasname"] = map["disease_name"].toString();
+            if (map.contains("variety"))
+                obj["variaty"] = map["variety"].toString();
+
+            jsonArray.append(obj);
+        } else if (item.canConvert<QJsonObject>()) {
+            // Direct QJsonObject
+            jsonArray.append(item.toJsonObject());
+        }
+    }
+
+    return jsonArray;
+}
+
+// QML Batch Sync Method - accepts QVariantList
+void APIClient::createBatchInferencesQml(const QVariantList &inferencesList)
+{
+    if (inferencesList.isEmpty()) {
+        emit networkError("Cannot sync empty batch");
+        emit batchCreateFinished(false, 0, 0, QJsonObject());
+        return;
+    }
+
+    setIsloading(true);
+
+    QJsonArray jsonArray = variantListToJsonArray(inferencesList);
+
+    emit batchProgress(0, jsonArray.size(), "Starting batch sync...");
+
+    createBatchInferences(jsonArray,
+                          [this, totalCount = jsonArray.size()](bool success, const QJsonObject &response) {
+                              int successCount = 0;
+                              if (success && response.contains("successCount")) {
+                                  successCount = response["successCount"].toInt();
+                              } else if (success) {
+                                  // If server doesn't return successCount, assume all succeeded
+                                  successCount = totalCount;
+                              }
+
+                              emit batchCreateFinished(success, totalCount, successCount, response);
+                              emit batchProgress(totalCount, totalCount, "Batch sync completed");
+                              setIsloading(false);
+                          }
+                          );
+}
+
+// QML Batch Sync Method - accepts JSON string directly
+void APIClient::createBatchInferencesFromJson(const QString &jsonArrayStr)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(jsonArrayStr.toUtf8());
+    if (!doc.isArray()) {
+        emit networkError("Invalid JSON array string");
+        emit batchCreateFinished(false, 0, 0, QJsonObject());
+        return;
+    }
+
+    QJsonArray jsonArray = doc.array();
+
+    if (jsonArray.isEmpty()) {
+        emit networkError("Cannot sync empty batch");
+        emit batchCreateFinished(false, 0, 0, QJsonObject());
+        return;
+    }
+
+    setIsloading(true);
+
+    emit batchProgress(0, jsonArray.size(), "Starting batch sync from JSON...");
+
+    createBatchInferences(jsonArray,
+                          [this, totalCount = jsonArray.size()](bool success, const QJsonObject &response) {
+                              int successCount = 0;
+                              if (success && response.contains("successCount")) {
+                                  successCount = response["successCount"].toInt();
+                              } else if (success) {
+                                  successCount = totalCount;
+                              }
+
+                              emit batchCreateFinished(success, totalCount, successCount, response);
+                              emit batchProgress(totalCount, totalCount, "Batch sync completed");
+                              setIsloading(false);
+                          }
+                          );
 }

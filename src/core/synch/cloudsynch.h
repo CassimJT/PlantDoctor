@@ -13,24 +13,24 @@
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #endif
 
-
-
 class CloudSynch : public QObject
 {
     Q_OBJECT
 public:
     explicit CloudSynch(QObject *parent = nullptr);
     static CloudSynch* instance();
-    void invoked() ;
-   // void notifyQtReady();
+    void invoked();
+
 signals:
     void workerInvoked();
+    void startSynchInvoked();
+
 private:
     void StartSchedua();
     void printLog();
-    static CloudSynch * _instance;
+    static CloudSynch* _instance;
     void showNotification();
-
+    bool m_alarmScheduled;  // Add this to track if alarm is already scheduled
 };
 
 #endif // CLOUDSYNCH_H

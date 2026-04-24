@@ -86,5 +86,49 @@ ApplicationWindow {
         Helper.setStatusBarAppearance(Qt.rgba(0,0,0,0),true)
         mainStackView = mainLoader.item.mainStackView
     }
+    // This stays active and will trigger every time alarm fires
+    Connections {
+        target: CloudSynch
 
+        // Connect to startSynchInvoked (emitted after notification is shown)
+        function onStartSynchInvoked() {
+            console.log("=== ALARM FIRED - Starting cloud sync ===")
+            var unsyncedEntries = HistoryModel.getUnsyncedEntriesArray()
+
+            if (unsyncedEntries.length > 0) {
+                console.log("Syncing", unsyncedEntries.length, "unsynced entries")
+                APIClient.createBatchInferencesQml(unsyncedEntries)
+            } else {
+                console.log("No unsynced entries to sync")
+            }
+        }
+
+        // Optional: Debug to see when workerInvoked happens
+        function onWorkerInvoked() {
+            console.log("workerInvoked received - notification shown")
+        }
+    }
+
+    // Handle batch sync result
+    Connections {
+        target: APIClient
+        function onBatchCreateFinished(success, totalCount, successCount, response) {
+            if (success) {
+                console.log("Sync successful - Total:", totalCount, "Succeeded:", successCount)
+                if (successCount === totalCount) {
+                    HistoryModel.markAllAsSynced()
+                }
+            } else {
+                console.error("Sync failed:", response ? response["message"] : "Unknown error")
+            }
+        }
+
+        function onBatchProgress(current, total, currentDisease) {
+            console.log("Sync progress:", current, "/", total)
+        }
+
+        function onNetworkError(error) {
+            console.error("Network error during sync:", error)
+        }
+    }
 }

@@ -5,6 +5,7 @@
 #include "android_app_NotificationChannelProxy.h"
 #include "android_app_NotificationProxy.h"
 #include "android_os_ContextProxy.h"
+
 #if defined(Q_OS_ANDROID)
 extern "C" JNIEXPORT void JNICALL
 Java_com_plantdoctor_NativeBridge_nativeInvoked(JNIEnv* env, jclass clazz) {
@@ -37,21 +38,26 @@ Java_com_plantdoctor_NativeBridge_nativeInvoked(JNIEnv* env, jclass clazz) {
                             "Exception: %s", e.what());
     }
 }
-
 #endif
 
 CloudSynch *CloudSynch::_instance = nullptr;
 
 CloudSynch::CloudSynch(QObject *parent)
     : QObject{parent}
+    , m_alarmScheduled(false)
 {
     __android_log_print(ANDROID_LOG_DEBUG, "CloudSynch", "CloudSynch constructor");
 
+    // Only schedule alarm ONCE when the singleton is created
+    static bool alarmScheduled = false;
+    if (!alarmScheduled) {
 #if defined(Q_OS_ANDROID)
-    // Don't schedule alarm immediately - wait for Qt to be fully ready
-    StartSchedua();
+        StartSchedua();
+        alarmScheduled = true;
 #endif
-    //connection to a signal when alra  is invokled
+    }
+
+    // Connect signals
     QObject::connect(
         this,
         &CloudSynch::workerInvoked,
@@ -69,7 +75,6 @@ CloudSynch *CloudSynch::instance()
     return _instance;
 }
 
-
 void CloudSynch::invoked()
 {
     __android_log_print(ANDROID_LOG_DEBUG, "CloudSynch", "invoked() called - emitting workerInvoked");
@@ -79,6 +84,11 @@ void CloudSynch::invoked()
 void CloudSynch::StartSchedua()
 {
 #if defined(Q_OS_ANDROID)
+    if (m_alarmScheduled) {
+        __android_log_print(ANDROID_LOG_DEBUG, "CloudSynch", "Alarm already scheduled, skipping");
+        return;
+    }
+
     __android_log_print(ANDROID_LOG_DEBUG, "CloudSynch", "StartSchedua called");
 
     QJniObject context = QNativeInterface::QAndroidApplication::context();
@@ -90,6 +100,7 @@ void CloudSynch::StartSchedua()
             "(Landroid/content/Context;)V",
             context.object<jobject>()
             );
+        m_alarmScheduled = true;
     } else {
         __android_log_print(ANDROID_LOG_ERROR, "CloudSynch", "Context is invalid");
     }
@@ -102,14 +113,10 @@ void CloudSynch::printLog()
     __android_log_print(ANDROID_LOG_DEBUG, "AlarmHelper", "Hello from AlarmManager!!");
 #endif
 }
-/**
- * @brief CloudSynch::showNotification
- * show a system notifcation when the alarm is triglled
- */
+
 void CloudSynch::showNotification()
 {
 #if defined(Q_OS_ANDROID)
-
     __android_log_print(ANDROID_LOG_DEBUG, "CloudSynch", "showNotification called");
 
     using namespace android::app;
@@ -121,7 +128,7 @@ void CloudSynch::showNotification()
     QString channelId = "plantdoctor_channel";
 
     // ─────────────────────────────
-    // Channel (FIXED)
+    // Channel
     // ─────────────────────────────
     QJniObject channelObj(
         "android/app/NotificationChannel",
@@ -143,11 +150,10 @@ void CloudSynch::showNotification()
         );
 
     NotificationManagerProxy manager(managerObj);
-
     manager.createNotificationChannel(channel);
 
     // ─────────────────────────────
-    // Builder (FIXED)
+    // Builder
     // ─────────────────────────────
     QJniObject builderObj(
         "android/app/Notification$Builder",
@@ -157,9 +163,8 @@ void CloudSynch::showNotification()
         );
 
     BuilderProxy builder(builderObj);
-
     builder.setContentTitle(QJniObject::fromString("PlantDoctor").object<jstring>());
-    builder.setContentText(QJniObject::fromString("Syching Data Stated").object<jstring>());
+    builder.setContentText(QJniObject::fromString("Syncing Data Started").object<jstring>());
     builder.setSmallIcon(17301659);
     builder.setAutoCancel(true);
 
@@ -167,8 +172,9 @@ void CloudSynch::showNotification()
     // Notify
     // ─────────────────────────────
     NotificationProxy notification = builder.build();
-
     manager.notify(1, notification);
 
+    __android_log_print(ANDROID_LOG_DEBUG, "CloudSynch", "Emitting startSynchInvoked");
+    emit startSynchInvoked();
 #endif
 }

@@ -264,23 +264,33 @@ Page {
 
     Connections {
         target: InfarenceRunner
-        //onInfarenceFinished:
-        function onInfarenceFinished () {
+
+        function onInfarenceFinished() {
             busyIndicator.visible = false
             busyIndicator.running = false
+
             let diseaseName = InfarenceRunner.diseaseName
             let classIndex = InfarenceRunner.classIndex
             let currentDate = Utils.getCurrentDate()
-            let confidence = InfarenceRunner.confidence
-            let fixedConfidence = confidence.toFixed(1)
-            console.log(fixedConfidence)
-            //save and persist the data
-            HistoryModel.addToHistory(diseaseName,classIndex,currentDate,fixedConfidence)
+            let confidence = InfarenceRunner.confidence  // This is 91.58 (percentage)
+            let location = "Zomba"  // to be changed when user adds actual location and variety
+            let variaty = diseaseName.split(" ")[0] + "_" + 777
+
+            // Convert percentage to decimal (0-1 range)
+            let decimalConfidence = confidence / 100
+
+            console.log("Confidence (percentage):", confidence)
+            console.log("Confidence (decimal):", decimalConfidence)
+
+            // Save with decimal confidence (0-1 range)
+            HistoryModel.addToHistory(diseaseName, classIndex, currentDate, decimalConfidence, location, variaty)
             console.log(InfarenceRunner.diseaseName)
         }
-        //when the infarence faild
-        function onInfarenceFaild() {
 
+        function onInfarenceFailed() {
+            busyIndicator.visible = false
+            busyIndicator.running = false
+            console.log("Inference failed")
         }
     }
 }
