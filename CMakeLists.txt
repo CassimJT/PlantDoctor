@@ -494,10 +494,9 @@ if(ANDROID)
 
     # Known locations (team + local + fallback)
     set(POSSIBLE_OPENSSL_DIRS
+        "$ENV{HOME}/Android/Sdk/android_openssl"
         "${OPENSSL_ROOT}"
         "$ENV{OPENSSL_ANDROID_ROOT}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/android/openssl"
-        "${WORKSPACE_BASE_DIR}/android_openssl"
         "/media/csociety/Backup/CISociety/Android/Sdk/android_openssl"
     )
 
