@@ -158,8 +158,92 @@ Page {
             anchors.margins: 24
             anchors.bottomMargin: 48
 
-            spacing: 12
+            spacing: 16
 
+
+            // Retake + Gallery round buttons row
+                      Row {
+                          anchors.horizontalCenter: parent.horizontalCenter
+                          spacing: 48
+
+                          // Retake
+                          Column {
+                              spacing: 8
+                              anchors.verticalCenter: parent.verticalCenter
+
+                              Rectangle {
+                                  width: 64; height: 64; radius: 32
+                                  anchors.horizontalCenter: parent.horizontalCenter
+                                  color: retakeArea.containsPress ? "#ddd8cc" : "#e8e4da"
+                                  border.color: "#cccccc"; border.width: 1
+                                  Behavior on color { ColorAnimation { duration: 120 } }
+
+                                  Image {
+                                      source: "qrc:/assets/home/icons8-retake-100.png"
+                                      width: 30; height: 30
+                                      anchors.centerIn: parent
+                                  }
+
+
+
+                                  MouseArea {
+                                      id: retakeArea
+                                      anchors.fill: parent
+                                      onClicked: {
+                                          mainStackView?.pop()
+                                          Helper.setIsCamera(true)
+                                      }
+                                  }
+                              }
+
+                              Text {
+                                  anchors.horizontalCenter: parent.horizontalCenter
+                                  text: "Retake"
+                                  color: "#445544"
+                                  font.pointSize: 12
+                                  font.letterSpacing: 0.3
+                              }
+                          }
+
+                          // Gallery
+                          Column {
+                              spacing: 8
+                              anchors.verticalCenter: parent.verticalCenter
+
+                              Rectangle {
+                                  width: 64; height: 64; radius: 32
+                                  anchors.horizontalCenter: parent.horizontalCenter
+                                  color: galleryPressArea.containsPress ? "#ddd8cc" : "#e8e4da"
+                                  border.color: "#cccccc"; border.width: 1
+                                  Behavior on color { ColorAnimation { duration: 120 } }
+
+                                  Image {
+                                      source: "qrc:/assets/home/gallery-96.png"
+                                      width: 30; height: 30
+                                      anchors.centerIn: parent
+                                  }
+
+
+
+                                  MouseArea {
+                                      id: galleryPressArea
+                                      anchors.fill: parent
+                                      onClicked: {
+                                          // wire your gallery picker here
+                                      }
+                                  }
+                              }
+
+                              Text {
+                                  anchors.horizontalCenter: parent.horizontalCenter
+                                  text: "Gallery"
+                                  color: "#445544"
+                                  font.pointSize: 12
+                                  font.letterSpacing: 0.3
+                              }
+                          }
+                      }
+            //analysis
             Rectangle {
                 width: parent.width
                 height: 60
@@ -212,38 +296,6 @@ Page {
                 }
             }
 
-            Rectangle {
-                width: parent.width
-                height: 52
-                radius: 15
-                color: "#02a3b5"
-
-                Row {
-                    anchors.centerIn: parent
-                    spacing: 8
-
-                    Image {
-                        source: "qrc:/assets/home/icons8-retake-100.png"
-                        width: 20
-                        height: 20
-                    }
-
-                    Text {
-                        text: "Retake Photo"
-                        color: "#ccffffff"
-                        font.pointSize: 16
-                    }
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-
-                    onClicked: {
-                        mainStackView?.pop()
-                        Helper.setIsCamera(true)
-                    }
-                }
-            }
         }
     }
 
