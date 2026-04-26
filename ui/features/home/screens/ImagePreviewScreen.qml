@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import HistoryModel
+import QtQuick.Dialogs
 import "../../../utils/Utils.js" as Utils
 Page {
     id: previewView
@@ -220,7 +221,7 @@ Page {
                                       id: galleryPressArea
                                       anchors.fill: parent
                                       onClicked: {
-                                          // wire your gallery picker here
+                                          fileDialog.open()
                                       }
                                   }
                               }
@@ -287,6 +288,21 @@ Page {
                 }
             }
 
+        }
+    }
+    //--------dialgo section-----
+    FileDialog {
+        id: fileDialog
+        title: "Select an Image"
+        onAccepted: {
+            console.log("Selected file:", fileDialog.selectedFile);
+            var path = fileDialog.selectedFile
+            Helper.loadImageFromContentUri(path)
+            mainStackView.push("ImagePreviewScreen.qml")
+        }
+
+        onRejected: {
+            console.log("File selection canceled.");
         }
     }
 
