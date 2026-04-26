@@ -140,16 +140,7 @@ Page {
             }
         }
 
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: photoFrame.bottom
-            anchors.topMargin: 14
 
-            text: "Looking good? Tap Analyse to identify"
-            color: "#66ffffff"
-            font.pointSize: 11
-            font.letterSpacing: 0.4
-        }
 
         Column {
             anchors.bottom: parent.bottom
@@ -174,7 +165,7 @@ Page {
                               Rectangle {
                                   width: 64; height: 64; radius: 32
                                   anchors.horizontalCenter: parent.horizontalCenter
-                                  color: retakeArea.containsPress ? "#ddd8cc" : "#e8e4da"
+                                  color: retakeArea.containsPress ? "#cfd8cc" : "#cfd8cc"
                                   border.color: "#cccccc"; border.width: 1
                                   Behavior on color { ColorAnimation { duration: 120 } }
 
@@ -213,7 +204,7 @@ Page {
                               Rectangle {
                                   width: 64; height: 64; radius: 32
                                   anchors.horizontalCenter: parent.horizontalCenter
-                                  color: galleryPressArea.containsPress ? "#ddd8cc" : "#e8e4da"
+                                  color: galleryPressArea.containsPress ? "#ddd8cc" : "#cfd8cc"
                                   border.color: "#cccccc"; border.width: 1
                                   Behavior on color { ColorAnimation { duration: 120 } }
 
