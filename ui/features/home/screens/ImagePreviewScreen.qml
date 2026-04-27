@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import HistoryModel
+import QtQuick.Dialogs
 import "../../../utils/Utils.js" as Utils
 Page {
     id: previewView
@@ -140,16 +141,7 @@ Page {
             }
         }
 
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: photoFrame.bottom
-            anchors.topMargin: 14
 
-            text: "Looking good? Tap Analyse to identify"
-            color: "#66ffffff"
-            font.pointSize: 11
-            font.letterSpacing: 0.4
-        }
 
         Column {
             anchors.bottom: parent.bottom
@@ -158,8 +150,92 @@ Page {
             anchors.margins: 24
             anchors.bottomMargin: 48
 
-            spacing: 12
+            spacing: 16
 
+
+            // Retake + Gallery round buttons row
+                      Row {
+                          anchors.horizontalCenter: parent.horizontalCenter
+                          spacing: 48
+
+                          // Retake
+                          Column {
+                              spacing: 8
+                              anchors.verticalCenter: parent.verticalCenter
+
+                              Rectangle {
+                                  width: 64; height: 64; radius: 32
+                                  anchors.horizontalCenter: parent.horizontalCenter
+                                  color: retakeArea.containsPress ? "#cfd8cc" : "#cfd8cc"
+                                  border.color: "#cccccc"; border.width: 1
+                                  Behavior on color { ColorAnimation { duration: 120 } }
+
+                                  Image {
+                                      source: "qrc:/assets/home/retake.png"
+                                      width: 30; height: 30
+                                      anchors.centerIn: parent
+                                  }
+
+
+
+                                  MouseArea {
+                                      id: retakeArea
+                                      anchors.fill: parent
+                                      onClicked: {
+                                          mainStackView?.pop()
+                                          Helper.setIsCamera(true)
+                                      }
+                                  }
+                              }
+
+                              Text {
+                                  anchors.horizontalCenter: parent.horizontalCenter
+                                  text: "Retake"
+                                  color: "#445544"
+                                  font.pointSize: 12
+                                  font.letterSpacing: 0.3
+                              }
+                          }
+
+                          // Gallery
+                          Column {
+                              spacing: 8
+                              anchors.verticalCenter: parent.verticalCenter
+
+                              Rectangle {
+                                  width: 64; height: 64; radius: 32
+                                  anchors.horizontalCenter: parent.horizontalCenter
+                                  color: galleryPressArea.containsPress ? "#ddd8cc" : "#cfd8cc"
+                                  border.color: "#cccccc"; border.width: 1
+                                  Behavior on color { ColorAnimation { duration: 120 } }
+
+                                  Image {
+                                      source: "qrc:/assets/home/gallery.png"
+                                      width: 30; height: 30
+                                      anchors.centerIn: parent
+                                  }
+
+
+
+                                  MouseArea {
+                                      id: galleryPressArea
+                                      anchors.fill: parent
+                                      onClicked: {
+                                          fileDialog.open()
+                                      }
+                                  }
+                              }
+
+                              Text {
+                                  anchors.horizontalCenter: parent.horizontalCenter
+                                  text: "Gallery"
+                                  color: "#445544"
+                                  font.pointSize: 12
+                                  font.letterSpacing: 0.3
+                              }
+                          }
+                      }
+            //analysis
             Rectangle {
                 width: parent.width
                 height: 60
@@ -184,15 +260,15 @@ Page {
                     spacing: 10
 
                     Image {
-                        source: "qrc:/assets/home/icons8-analyse-60.png"
-                        width: 24
-                        height: 24
+                        source: "qrc:/assets/home/diagnosis.png"
+                        width: 30
+                        height: 30
                     }
 
                     Text {
                         text: "Analyse Plant"
                         color: "white"
-                        font.pointSize: 16
+                        font.pointSize: 18
                         font.bold: true
                     }
                 }
@@ -212,38 +288,21 @@ Page {
                 }
             }
 
-            Rectangle {
-                width: parent.width
-                height: 52
-                radius: 15
-                color: "#02a3b5"
+        }
+    }
+    //--------dialgo section-----
+    FileDialog {
+        id: fileDialog
+        title: "Select an Image"
+        onAccepted: {
+            console.log("Selected file:", fileDialog.selectedFile);
+            var path = fileDialog.selectedFile
+            Helper.loadImageFromContentUri(path)
+            mainStackView.push("ImagePreviewScreen.qml")
+        }
 
-                Row {
-                    anchors.centerIn: parent
-                    spacing: 8
-
-                    Image {
-                        source: "qrc:/assets/home/icons8-retake-100.png"
-                        width: 20
-                        height: 20
-                    }
-
-                    Text {
-                        text: "Retake Photo"
-                        color: "#ccffffff"
-                        font.pointSize: 16
-                    }
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-
-                    onClicked: {
-                        mainStackView?.pop()
-                        Helper.setIsCamera(true)
-                    }
-                }
-            }
+        onRejected: {
+            console.log("File selection canceled.");
         }
     }
 
