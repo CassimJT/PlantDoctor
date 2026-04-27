@@ -298,7 +298,7 @@ Page {
             console.log("Selected file:", fileDialog.selectedFile);
             var path = fileDialog.selectedFile
             Helper.loadImageFromContentUri(path)
-            mainStackView.push("ImagePreviewScreen.qml")
+           // mainStackView.push("ImagePreviewScreen.qml")
         }
 
         onRejected: {
