@@ -171,7 +171,7 @@ Page {
                                   Behavior on color { ColorAnimation { duration: 120 } }
 
                                   Image {
-                                      source: "qrc:/assets/home/icons8-retake-100.png"
+                                      source: "qrc:/assets/home/retake.png"
                                       width: 30; height: 30
                                       anchors.centerIn: parent
                                   }
@@ -210,7 +210,7 @@ Page {
                                   Behavior on color { ColorAnimation { duration: 120 } }
 
                                   Image {
-                                      source: "qrc:/assets/home/gallery-96.png"
+                                      source: "qrc:/assets/home/gallery.png"
                                       width: 30; height: 30
                                       anchors.centerIn: parent
                                   }
@@ -260,15 +260,15 @@ Page {
                     spacing: 10
 
                     Image {
-                        source: "qrc:/assets/home/icons8-analyse-60.png"
-                        width: 24
-                        height: 24
+                        source: "qrc:/assets/home/diagnosis.png"
+                        width: 30
+                        height: 30
                     }
 
                     Text {
                         text: "Analyse Plant"
                         color: "white"
-                        font.pointSize: 16
+                        font.pointSize: 18
                         font.bold: true
                     }
                 }

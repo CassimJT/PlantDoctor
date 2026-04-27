@@ -218,14 +218,14 @@ Page {
                     spacing: 10
 
                     Image {
-                        source: "qrc:/assets/home/gallery-96.png"
-                        width: 24; height: 24
+                        source: "qrc:/assets/home/gallery.png"
+                        width: 26; height: 26
                         anchors.verticalCenter: parent.verticalCenter
                     }
                     Text {
                         text: "Select from Gallery"
                         color: "white"
-                        font.pointSize: 14
+                        font.pointSize: 16
                         font.bold: true
                         font.letterSpacing: 0.6
                         anchors.verticalCenter: parent.verticalCenter
