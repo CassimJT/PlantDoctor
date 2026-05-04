@@ -18,5 +18,19 @@ Page {
         }
 
     }
+    PageIndicator {
+        id: indicator
 
+        count: view.count
+        currentIndex: view.currentIndex
+
+        anchors.bottom: view.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
+    //to do
+    /*
+        add swip animation
+        addswip conroll
+        add a live monitobuttun
+    */
 }
