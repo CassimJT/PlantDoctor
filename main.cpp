@@ -14,6 +14,8 @@
 #include "src/core/mqtt/pnddevicemodel.h"
 #include "src/core/mqtt/pnddevicestate.h"
 #include "src/core/mqtt/pnddevice.h"
+#include "src/core/synch/apiclient.h"
+#include "src/core/synch/cloudsynch.h"
 
 int main(int argc, char *argv[])
 {
@@ -40,6 +42,13 @@ int main(int argc, char *argv[])
     QString appLanguage = (systemLang == "ny" || systemLang == "mw") ? "ny" : "en";
     DiseaseInfoManager::instance().loadLanguage(appLanguage);
 
+    // ApiClient (can be regular instance or singleton if needed)
+    APIClient apiClient;
+
+    // CloudSynch - Use singleton instance
+    // Don't create on stack, get the singleton instance instead
+    CloudSynch* cloudSynch = CloudSynch::instance();
+
     // QML Engine
     QQmlApplicationEngine engine;
 
@@ -49,6 +58,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("CurrentLanguage", appLanguage);
     engine.rootContext()->setContextProperty("DeviceConfigurator", &deviceConfigurator);
     engine.rootContext()->setContextProperty("DeviceModel", deviceModel);
+    engine.rootContext()->setContextProperty("APIClient", &apiClient);
+    engine.rootContext()->setContextProperty("CloudSynch", cloudSynch);  // Pass the singleton pointer
 
     // Register enum for QML
     qmlRegisterUncreatableType<PNDDeviceState>(
@@ -58,7 +69,7 @@ int main(int argc, char *argv[])
         );
 
     // RTSP
-    qmlRegisterType<RTSVideoOutput>("RTSVideoOutput",1,0,"RTSVideoOutput");
+    qmlRegisterType<RTSVideoOutput>("RTSVideoOutput", 1, 0, "RTSVideoOutput");
 
     // Language Names
     QVariantMap languageNames;

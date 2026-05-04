@@ -19,13 +19,18 @@ class CloudSynch : public QObject
 public:
     explicit CloudSynch(QObject *parent = nullptr);
     static CloudSynch* instance();
-    void invoked() ;
+    void invoked();
+
 signals:
     void workerInvoked();
+    void startSynchInvoked();
+
 private:
     void StartSchedua();
     void printLog();
-    static CloudSynch * _instance;
+    static CloudSynch* _instance;
+    void showNotification();
+    bool m_alarmScheduled;  // Add this to track if alarm is already scheduled
 };
 
 #endif // CLOUDSYNCH_H

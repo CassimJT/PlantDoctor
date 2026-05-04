@@ -22,14 +22,16 @@
         <file>assets/home/gallery-96.png</file>
         <file>assets/languages/diseases_ny.json</file>
         <file>assets/languages/diseases_en.json</file>
-
         <file>assets/hotlines/whatsapp.apng</file>
-
         <file>assets/home/icons8-switch-camera-100.png</file>
         <file>assets/home/icons8-retake-100.png</file>
         <file>assets/home/icons8-analyse-60.png</file>
         <file>assets/settings/PND.svg</file>
         <file>assets/settings/PND.png</file>
         <file>assets/infarence/delete.png</file>
+        <file>assets/home/identify.png</file>
+        <file>assets/home/diagnosis.png</file>
+        <file>assets/home/gallery.png</file>
+        <file>assets/home/retake.png</file>
     </qresource>
 </RCC>

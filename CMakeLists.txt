@@ -32,7 +32,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
 # Qt find_package and standard setup first — this is what makes wizard happy
-find_package(Qt6 REQUIRED COMPONENTS Quick Multimedia Concurrent Core)
+find_package(Qt6 REQUIRED COMPONENTS Quick Multimedia Concurrent Core Network)
 qt_standard_project_setup(REQUIRES 6.8)
 
 # ─────────────────────────────────────────────────────────────
@@ -100,6 +100,7 @@ qt_add_qml_module(appPlantDoctor
         src/core/rtsp/rtsvideooutput.h
         src/core/rtsp/rtsvideooutput.cpp
         QML_FILES ui/features/home/screens/ImagePreviewScreen.qml
+        SOURCES src/core/synch/apiclient.h src/core/synch/apiclient.cpp
         SOURCES src/core/synch/apiclient.h src/core/synch/apiclient.cpp
 
 
@@ -477,12 +478,86 @@ target_link_libraries(appPlantDoctor
         Qt6::Concurrent
         Qt6::Core
         Qt6::Mqtt
+        Qt6::Network
 )
 
 # ─────────────────────────────────────────────────────────────
 # Android packaging
 # ─────────────────────────────────────────────────────────────
 if(ANDROID)
+    # ─────────────────────────────────────────────
+    # OpenSSL discovery (Qt 6 Android - team safe)
+    # ─────────────────────────────────────────────
+
+    # Allow manual override (highest priority)
+    set(OPENSSL_ROOT "" CACHE PATH "Path to android_openssl root")
+
+    # Known locations (team + local + fallback)
+    set(POSSIBLE_OPENSSL_DIRS
+        "$ENV{HOME}/Android/Sdk/android_openssl"
+        "${OPENSSL_ROOT}"
+        "$ENV{OPENSSL_ANDROID_ROOT}"
+        "/media/csociety/Backup/CISociety/Android/Sdk/android_openssl"
+    )
+
+    set(FOUND_OPENSSL_ROOT "")
+
+    foreach(dir IN LISTS POSSIBLE_OPENSSL_DIRS)
+
+        # Case 1: flat ABI layout (Qt standard)
+        if(EXISTS "${dir}/arm64-v8a/libssl_3.so")
+            set(FOUND_OPENSSL_ROOT "${dir}")
+            message(STATUS "Found OpenSSL (flat ABI) at: ${FOUND_OPENSSL_ROOT}")
+            break()
+        endif()
+
+        # Case 2: ssl_3 wrapper layout (your current setup)
+        if(EXISTS "${dir}/ssl_3/arm64-v8a/libssl_3.so")
+            set(FOUND_OPENSSL_ROOT "${dir}/ssl_3")
+            message(STATUS "Found OpenSSL (ssl_3 layout) at: ${FOUND_OPENSSL_ROOT}")
+            break()
+        endif()
+
+    endforeach()
+
+    if(NOT FOUND_OPENSSL_ROOT)
+        message(FATAL_ERROR
+            "OpenSSL not found for Android build.\n\n"
+            "Expected one of:\n"
+            "  - <path>/arm64-v8a/libssl_3.so\n"
+            "  - <path>/ssl_3/arm64-v8a/libssl_3.so\n\n"
+            "Fix options:\n"
+            "  1) Set -DOPENSSL_ROOT=/path/to/android_openssl\n"
+            "  2) export OPENSSL_ANDROID_ROOT=/path/to/android_openssl\n"
+            "  3) Put in project: android/openssl\n"
+        )
+    endif()
+
+    # ─────────────────────────────────────────────
+    # Required OpenSSL libraries
+    # ─────────────────────────────────────────────
+
+    set(OPENSSL_LIBS
+        ${FOUND_OPENSSL_ROOT}/arm64-v8a/libssl_3.so
+        ${FOUND_OPENSSL_ROOT}/arm64-v8a/libcrypto_3.so
+        ${FOUND_OPENSSL_ROOT}/armeabi-v7a/libssl_3.so
+        ${FOUND_OPENSSL_ROOT}/armeabi-v7a/libcrypto_3.so
+    )
+
+    # Validate all required binaries exist
+    foreach(lib IN LISTS OPENSSL_LIBS)
+        if(NOT EXISTS ${lib})
+            message(FATAL_ERROR "Missing OpenSSL library: ${lib}")
+        endif()
+    endforeach()
+
+    # ─────────────────────────────────────────────
+    # Attach OpenSSL to Android APK packaging
+    # ─────────────────────────────────────────────
+
+    set_target_properties(appPlantDoctor PROPERTIES
+        QT_ANDROID_EXTRA_LIBS "${OPENSSL_LIBS}"
+    )
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/android")
         set_property(TARGET appPlantDoctor APPEND PROPERTY
             QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android

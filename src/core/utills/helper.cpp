@@ -8,6 +8,7 @@ Helper::Helper(QObject *parent)
     isHompage(false)        // Initialize the member
 {
    //setStatusBarAppearance(QColor(Qt::transparent), true);
+    requestIgnoreBatteryOptimization();
 }
 
 /**
@@ -131,6 +132,25 @@ void Helper::loadImageFromContentUri(const QString &uriString)
 QString Helper::imagePreview()
 {
     return m_imagePath;
+}
+
+void Helper::requestIgnoreBatteryOptimization()
+{
+#if defined(Q_OS_ANDROID)
+    qDebug() << "Requesting battery optimization exemption";
+    QJniObject context = QNativeInterface::QAndroidApplication::context();
+    if (context.isValid()) {
+        QJniObject::callStaticMethod<void>(
+            "com/plantdoctor/BatteryOptimizationHelper",
+            "requestIgnoreBatteryOptimization",
+            "(Landroid/content/Context;)V",
+            context.object<jobject>()
+            );
+        qDebug() << "Battery optimization request initiated";
+    } else {
+        qDebug() << "Failed to get valid context for battery optimization request";
+    }
+#endif
 }
 
 bool Helper::getIsCamera() const

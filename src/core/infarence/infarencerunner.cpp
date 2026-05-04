@@ -12,10 +12,10 @@ InfarenceRunner::InfarenceRunner(QObject *parent)
     , m_cure("")
     , m_confidence(0.0)
     , m_classIndex(-1)
-    , m_currentLanguage("en")
+    , m_currentLanguage("ny")
 {
-    // Initialize the disease info manager
-    DiseaseInfoManager::instance().loadLanguage("en");
+    // DON'T force load English here - just get current language from manager
+    m_currentLanguage = DiseaseInfoManager::instance().currentLanguage();
 
     // Connect to language changes from manager
     connect(&DiseaseInfoManager::instance(), &DiseaseInfoManager::languageChanged,

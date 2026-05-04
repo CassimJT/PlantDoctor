@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.provider.Settings;
 import android.util.Log;
 import java.util.Calendar;
 
@@ -38,7 +37,7 @@ public class AlarmHelper {
             }
 
             Intent intent = new Intent(context, AlarmReceiver.class);
-            intent.setAction("com.salesmate.ALARM_TRIGGERED");
+            intent.setAction("com.plantdoctor.ALARM_TRIGGERED");
             intent.putExtra("source", "qt_android");
 
             int flags = PendingIntent.FLAG_UPDATE_CURRENT;
@@ -111,5 +110,3 @@ public class AlarmHelper {
         }
     }
 }
-
-
