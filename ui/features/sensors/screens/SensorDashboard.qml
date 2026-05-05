@@ -85,59 +85,68 @@ Page {
     }
 
     Rectangle {
-            z: 10
+        z: 10
+        anchors {
+            bottom: indicator.top
+            bottomMargin: 16
+            horizontalCenter: parent.horizontalCenter
+        }
+        width: 180
+        height: 46
+        radius: 23
+        gradient: Gradient {
+            orientation: Gradient.Horizontal
+            GradientStop { position: 0.0; color: "#34c45a" }
+            GradientStop { position: 1.0; color: "#5dde7a" }
+        }
+
+        Rectangle {
             anchors {
-                bottom: indicator.top
-                bottomMargin: 16
-                horizontalCenter: parent.horizontalCenter
+                fill: parent
+                margins: -2
             }
-            width: 180
-            height: 46
-            radius: 23
-            color: liveMA.pressed ? "#142019" : "#1A2E1F"
+            radius: parent.radius + 2
+            color: "transparent"
+            border.color: Qt.rgba(0, 0, 0, 0.15)
+            border.width: 3
+            z: -1
+        }
 
-            Behavior on color { ColorAnimation { duration: 100 } }
+        Row {
+            anchors.centerIn: parent
+            spacing: 8
+            Image {
+                 width: 20; height: 20
+                 source: "qrc:/assets/appbar/pest.svg"
+                 fillMode: Image.PreserveAspectFit
+                 anchors.verticalCenter: parent.verticalCenter
+             }
 
-            // drop shadow effect
             Rectangle {
-                anchors {
-                    fill: parent
-                    margins: -2
-                }
-                radius: parent.radius + 2
-                color: "transparent"
-                border.color: Qt.rgba(0, 0, 0, 0.15)
-                border.width: 3
-                z: -1
-            }
+                width: 8; height: 8
+                radius: 4
+                color: "#FFFFFF"
+                anchors.verticalCenter: parent.verticalCenter
 
-            Row {
-                anchors.centerIn: parent
-                spacing: 8
-
-                Rectangle {
-                    width: 8; height: 8
-                    radius: 4
-                    color: "#4CAF50"
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    SequentialAnimation on opacity {
-                        loops: Animation.Infinite
-                        NumberAnimation { to: 0.2; duration: 600 }
-                        NumberAnimation { to: 1.0; duration: 600 }
-                    }
-                }
-
-                Text {
-                    text: "Live Monitor"
-                    font.family: "Georgia"
-                    font.pixelSize: 15
-                    font.bold: true
-                    color: "#FFFFFF"
-                    anchors.verticalCenter: parent.verticalCenter
+                SequentialAnimation on opacity {
+                    loops: Animation.Infinite
+                    NumberAnimation { to: 0.2; duration: 600 }
+                    NumberAnimation { to: 1.0; duration: 600 }
                 }
             }
 
+            Text {
+                text: "Live Monitor"
+                font.family: "Georgia"
+                font.pixelSize: 15
+                font.bold: true
+                color: "#FFFFFF"
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+
+
+    }
             MouseArea {
                 id: liveMA
                 anchors.fill: parent
@@ -146,7 +155,7 @@ Page {
                 }
             }
         }
-    }
+
     //to do
     /*
         add swip animation
