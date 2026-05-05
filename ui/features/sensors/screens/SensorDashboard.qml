@@ -18,6 +18,22 @@ Page {
         }
 
     }
+
+    Timer {
+            id: autoSwipe
+            interval: 3000
+            running: true
+            repeat: true
+            onTriggered: {
+                if (view.currentIndex < view.count - 1) {
+                    view.currentIndex++
+                } else {
+                    view.currentIndex = 0
+                }
+            }
+        }
+
+
     PageIndicator {
         id: indicator
 
@@ -26,6 +42,17 @@ Page {
 
         anchors.bottom: view.bottom
         anchors.horizontalCenter: parent.horizontalCenter
+
+        delegate: Rectangle {
+                   width: index === view.currentIndex ? 16 : 8
+                   height: 8
+                   radius: 4
+                   color: index === view.currentIndex ? "#1A2E1F" : "#8FAF8F"
+                   anchors.verticalCenter: parent.verticalCenter
+
+                   Behavior on width { NumberAnimation { duration: 200 } }
+                   Behavior on color { ColorAnimation { duration: 200 } }
+               }
     }
     //to do
     /*
