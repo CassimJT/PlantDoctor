@@ -9,6 +9,35 @@ Page {
         id: view
         currentIndex: 0
         anchors.fill: parent
+        interactive: true
+       //swipe control
+        contentItem: ListView {
+                    model: view.contentModel
+                    interactive: view.interactive
+                    currentIndex: view.currentIndex
+                    focus: view.focus
+
+                    spacing: view.spacing
+                    orientation: view.orientation
+                    snapMode: ListView.SnapOneItem
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    highlightRangeMode: ListView.StrictlyEnforceRange
+                    preferredHighlightBegin: 0
+                    preferredHighlightEnd: 0
+                    highlightMoveDuration: 400
+                    flickDeceleration: 2500
+                    maximumFlickVelocity: 2500
+
+                    // pause auto swipe when user is swiping
+                    onDraggingChanged: {
+                        if (dragging) {
+                            autoSwipe.stop()
+                        } else {
+                            autoSwipe.restart()
+                        }
+                    }
+                }
 
         TempeatureHumidity{
 
@@ -18,7 +47,7 @@ Page {
         }
 
     }
-
+   // swipe timer
     Timer {
             id: autoSwipe
             interval: 3000
@@ -54,10 +83,74 @@ Page {
                    Behavior on color { ColorAnimation { duration: 200 } }
                }
     }
+
+    Rectangle {
+            z: 10
+            anchors {
+                bottom: indicator.top
+                bottomMargin: 16
+                horizontalCenter: parent.horizontalCenter
+            }
+            width: 180
+            height: 46
+            radius: 23
+            color: liveMA.pressed ? "#142019" : "#1A2E1F"
+
+            Behavior on color { ColorAnimation { duration: 100 } }
+
+            // drop shadow effect
+            Rectangle {
+                anchors {
+                    fill: parent
+                    margins: -2
+                }
+                radius: parent.radius + 2
+                color: "transparent"
+                border.color: Qt.rgba(0, 0, 0, 0.15)
+                border.width: 3
+                z: -1
+            }
+
+            Row {
+                anchors.centerIn: parent
+                spacing: 8
+
+                Rectangle {
+                    width: 8; height: 8
+                    radius: 4
+                    color: "#4CAF50"
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    SequentialAnimation on opacity {
+                        loops: Animation.Infinite
+                        NumberAnimation { to: 0.2; duration: 600 }
+                        NumberAnimation { to: 1.0; duration: 600 }
+                    }
+                }
+
+                Text {
+                    text: "Live Monitor"
+                    font.family: "Georgia"
+                    font.pixelSize: 15
+                    font.bold: true
+                    color: "#FFFFFF"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            MouseArea {
+                id: liveMA
+                anchors.fill: parent
+                onClicked: {
+                    mainStackView.push("LiveMonitorScreen.qml")
+                }
+            }
+        }
+    }
     //to do
     /*
         add swip animation
         addswip conroll
         add a live monitobuttun
     */
-}
+
