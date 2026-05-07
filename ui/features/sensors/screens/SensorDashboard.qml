@@ -5,6 +5,7 @@ import "../pages"
 
 Page {
     id: sensorDashboard
+
     SwipeView{
         id: view
         currentIndex: 0
@@ -47,6 +48,8 @@ Page {
         }
 
     }
+
+
    // swipe timer
     Timer {
             id: autoSwipe
@@ -100,6 +103,14 @@ Page {
             GradientStop { position: 1.0; color: "#5dde7a" }
         }
 
+        MouseArea {
+              id: liveMA
+              anchors.fill: parent
+              onClicked: {
+                  mainStackView.push("LiveMonitorScreen.qml")
+              }
+          }
+
         Rectangle {
             anchors {
                 fill: parent
@@ -122,18 +133,6 @@ Page {
                  anchors.verticalCenter: parent.verticalCenter
              }
 
-            Rectangle {
-                width: 8; height: 8
-                radius: 4
-                color: "#FFFFFF"
-                anchors.verticalCenter: parent.verticalCenter
-
-                SequentialAnimation on opacity {
-                    loops: Animation.Infinite
-                    NumberAnimation { to: 0.2; duration: 600 }
-                    NumberAnimation { to: 1.0; duration: 600 }
-                }
-            }
 
             Text {
                 text: "Live Monitor"
@@ -147,13 +146,7 @@ Page {
 
 
     }
-            MouseArea {
-                id: liveMA
-                anchors.fill: parent
-                onClicked: {
-                    mainStackView.push("LiveMonitorScreen.qml")
-                }
-            }
+
         }
 
     //to do
