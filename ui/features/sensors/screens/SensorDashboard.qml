@@ -95,13 +95,19 @@ Page {
             bottomMargin: 16
             horizontalCenter: parent.horizontalCenter
         }
-        width: 180
-        height: 46
-        radius: 23
+        width: 220
+        height: 60
+        radius: 15
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0.0; color: "#34c45a" }
             GradientStop { position: 1.0; color: "#5dde7a" }
+        }
+        Rectangle {
+            anchors { top: parent.top; left: parent.left; right: parent.right }
+            height: parent.height / 2
+            radius: parent.radius
+            color: "#1affffff"
         }
 
         MouseArea {
@@ -112,17 +118,6 @@ Page {
               }
           }
 
-        Rectangle {
-            anchors {
-                fill: parent
-                margins: -2
-            }
-            radius: parent.radius + 2
-            color: "transparent"
-            border.color: Qt.rgba(0, 0, 0, 0.15)
-            border.width: 3
-            z: -1
-        }
 
         Row {
             anchors.centerIn: parent
