@@ -6,7 +6,7 @@ Page {
     objectName: "SignUp"
     width: 360
     height: 800
-    background: Rectangle { color: "#e8efe6" }
+    background: Rectangle { color: "#edf2e0" }
 
     Flickable {
         anchors.fill: parent
@@ -157,9 +157,19 @@ Page {
                         Layout.fillWidth: true
                         height: 52
                         radius: 14
-                        color: signUpMA.pressed ? "#7A9E7E" : "#8FAF8F"
+                        gradient: Gradient {
+                            orientation: Gradient.Horizontal
+                            GradientStop { position: 0.0; color: signUpMA.pressed ? "#2a9e48" : "#34c45a" }
+                            GradientStop { position: 1.0; color: signUpMA.pressed ? "#3dbf60" : "#5dde7a" }
+                        }
 
-                        Behavior on color { ColorAnimation { duration: 120 } }
+
+                        Rectangle {
+                            anchors { top: parent.top; left: parent.left; right: parent.right }
+                            height: parent.height / 2
+                            radius: parent.radius
+                            color: "#1affffff"
+                        }
 
                         Text {
                             anchors.centerIn: parent
@@ -194,15 +204,14 @@ Page {
                                                 text: "Sign in"
                                                 font.pixelSize: 13
                                                 font.bold: true
-                                                color: "#5A9E6F"
+                                                color: "#34c45a"
                                                 font.underline: true
                                                 anchors.verticalCenter: parent.verticalCenter
 
                                                 MouseArea {
                                                     anchors.fill: parent
                                                     onClicked: {
-                                                        // stackView.pop()
-                                                        console.log("Sign in tapped")
+                                                        mainStackView?.pop()
                                                     }
                                                 }
                                             }
