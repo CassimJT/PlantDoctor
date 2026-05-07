@@ -6,7 +6,7 @@ Page {
     objectName: "Hotline"
     width: 360
     height: 800
-    background: Rectangle { color: "#e8efe6" }
+    background: Rectangle { color: "#edf2e0" }
 
     ListModel {
         id: contactModel

@@ -50,6 +50,7 @@ Page {
     }
 
 
+
    // swipe timer
     Timer {
             id: autoSwipe
