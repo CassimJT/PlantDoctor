@@ -9,31 +9,53 @@ Page {
 
     property int timeDuration: 500
     property int pauseDuration: 200
+    property real confidence: 0
+    property int classIndex: 0
 
     property string imagePath: ""
     property string plantName: InfarenceRunner.diseaseName
     property string diseaseName: InfarenceRunner.diseaseName
     property real riskLevel: InfarenceRunner.riskLevel
     property string description: InfarenceRunner.description
-    property real confidence: InfarenceRunner.confidence
     property var treatments: InfarenceRunner.cure ? InfarenceRunner.cure.split("\n") : []
     property string noteText: ""
 
     background: Rectangle { color: "#edf2e0" }
 
     opacity: 0
-    Component.onCompleted: {
-        fadeIn.start()
-        fadeSequence.start()
-    }
 
     PropertyAnimation {
         id: fadeIn
-        target: inferenceResultScreen
+        target: inferenceHistoryScreen
         property: "opacity"
         from: 0
         to: 1
         duration: 380
+        onFinished: {
+            // After screen fades in, animate all child elements
+            animateChildren()
+        }
+    }
+
+    function animateChildren() {
+        // Animate each element with a staggered delay
+        var elements = [
+            titleText, plantNameText, diseaseHeading,
+            descriptionText, treatmentHeading, riskHeading,
+            confiLabel, roundBtn, riskCard
+        ]
+
+        for (var i = 0; i < elements.length; i++) {
+            if (elements[i]) {
+                elements[i].opacity = 1
+            }
+        }
+
+        // Animate treatment items
+        for (var j = 0; j < treatmentRepeater.count; j++) {
+            var item = treatmentRepeater.itemAt(j)
+            if (item) item.opacity = 1
+        }
     }
 
     ScrollView {
@@ -73,7 +95,6 @@ Page {
 
                         Image {
                             id: thumbLoader
-                            visible: false
                             source: imagePath
                             fillMode: Image.PreserveAspectCrop
                             onStatusChanged: {
@@ -104,17 +125,13 @@ Page {
                                 ctx.closePath()
                                 ctx.clip()
 
-                                if (thumbLoader.status === Image.Ready) {
+                                if (thumbLoader.status === Image.Ready && thumbLoader.source !== "") {
                                     ctx.drawImage(thumbLoader, 0, 0, width, height)
+                                } else {
+                                    ctx.fillStyle = "#2d3d2d"
+                                    ctx.fillRect(0, 0, width, height)
                                 }
                             }
-                        }
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: ""
-                            font.pointSize: 28
-                            visible: imagePath === ""
                         }
                     }
 
@@ -124,7 +141,7 @@ Page {
 
                         Text {
                             id: titleText
-                            text: diseaseName.split(" ")[0]
+                            text: diseaseName ? diseaseName.split(" ")[0] : "Disease"
                             color: "white"
                             font.bold: true
                             opacity: 0
@@ -133,7 +150,7 @@ Page {
 
                         Text {
                             id: plantNameText
-                            text: plantName
+                            text: plantName || "Plant"
                             color: "#88aa88"
                             opacity: 0
                             Behavior on opacity { NumberAnimation { duration: timeDuration } }
@@ -147,18 +164,19 @@ Page {
             // ── Headings & Description ──
             Text {
                 id: diseaseHeading
-                text: diseaseName + " on plant"
+                text: (diseaseName ? diseaseName : "Unknown") + " on plant"
                 anchors.left: parent.left
                 anchors.leftMargin: 20
                 font.bold: true
                 opacity: 0
+                Behavior on opacity { NumberAnimation { duration: timeDuration } }
             }
 
             Item { height: 10 }
 
             Text {
                 id: descriptionText
-                text: description
+                text: description || "No description available"
                 width: availableWidth - 40
                 anchors.left: parent.left
                 anchors.leftMargin: 20
@@ -176,6 +194,7 @@ Page {
                 anchors.leftMargin: 20
                 font.bold: true
                 opacity: 0
+                Behavior on opacity { NumberAnimation { duration: timeDuration } }
             }
 
             Item { height: 12 }
@@ -190,7 +209,7 @@ Page {
                     anchors.left: parent.left
                     anchors.leftMargin: 20
                     wrapMode: Text.WordWrap
-                    text: "• " + modelData
+                    text: "• " + (modelData || "No treatment available")
                     opacity: 0
                     Behavior on opacity { NumberAnimation { duration: timeDuration } }
                 }
@@ -231,7 +250,7 @@ Page {
                         color: "#e8ede6"
 
                         Rectangle {
-                            width: parent.width * riskLevel
+                            width: parent.width * (riskLevel || 0)
                             height: parent.height
                             radius: 3
                             gradient: Gradient {
@@ -254,14 +273,14 @@ Page {
                             text: "Low"
                             color: "#88aa88"
                             font.pointSize: 10
-                            anchors.left: parent.left
+                            Layout.alignment: Qt.AlignLeft
                         }
 
                         Text {
                             text: "High"
                             color: "#88aa88"
                             font.pointSize: 10
-                            anchors.right: parent.right
+                            Layout.alignment: Qt.AlignRight
                         }
                     }
                 }
@@ -293,8 +312,8 @@ Page {
 
                     Label {
                         anchors.centerIn: parent
-                        text: confidence.toFixed(1) + "%"
-                        color: confidence < 50 ? "red" : "green"
+                        text: (confidence || 0).toFixed(1) + "%"
+                        color: confidence < 50 ? "#d64e3a" : "#4a7c59"
                         font.bold: true
                     }
                 }
@@ -354,8 +373,10 @@ Page {
                     id: regenArea
                     anchors.fill: parent
                     onClicked: {
-                        mainLoader.item.mainStackView.pop()
-                        mainLoader.item.mainStackView.pop()
+                        if (mainLoader && mainLoader.item && mainLoader.item.mainStackView) {
+                            mainLoader.item.mainStackView.pop()
+                            mainLoader.item.mainStackView.pop()
+                        }
                     }
                 }
             }
@@ -398,6 +419,8 @@ Page {
         }
     }
 
-
-
+    Component.onCompleted: {
+        fadeIn.start()
+        InfarenceRunner.loadHistoryResult(classIndex)
+    }
 }

@@ -32,7 +32,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
 # Qt find_package and standard setup first — this is what makes wizard happy
-find_package(Qt6 REQUIRED COMPONENTS Quick Multimedia Concurrent Core Network Charts)
+find_package(Qt6 REQUIRED COMPONENTS Quick Multimedia Concurrent Core Network)
 qt_standard_project_setup(REQUIRES 6.8)
 
 # ─────────────────────────────────────────────────────────────
@@ -479,7 +479,6 @@ target_link_libraries(appPlantDoctor
         Qt6::Core
         Qt6::Mqtt
         Qt6::Network
-        Qt6::qtchartsqml2
 )
 
 # ─────────────────────────────────────────────────────────────

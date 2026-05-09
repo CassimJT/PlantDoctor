@@ -63,6 +63,13 @@ QString InfarenceRunner::currentLanguage() const
     return DiseaseInfoManager::instance().currentLanguage();
 }
 
+void InfarenceRunner::loadHistoryResult(int classIndex)
+{
+    clearResults();
+    setClassIndex(classIndex);
+    updateDiseaseInfo(classIndex);
+}
+
 void InfarenceRunner::updateDiseaseInfo(int classId)
 {
     DiseaseInfo info = DiseaseInfoManager::instance().getDiseaseInfo(classId);
