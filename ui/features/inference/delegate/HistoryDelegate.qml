@@ -6,7 +6,7 @@ import HistoryModel
 ItemDelegate {
     id: itemDelegate
     width: parent.width
-    height: 45
+    height: 47
     leftPadding: 0
     rightPadding: 0
     topPadding: 0
