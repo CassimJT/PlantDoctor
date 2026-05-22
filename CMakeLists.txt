@@ -74,6 +74,7 @@ qt_add_qml_module(appPlantDoctor
         ui/features/devices/componets/DeviceManu.qml
         ui/features/devices/delegate/DeviceDelegate.qml
         ui/features/settings/screens/SystemSettings.qml
+        ui/features/home/screens/ImagePreviewScreen.qml
 
     SOURCES
         src/core/mqtt/mqttclient.cpp
@@ -99,9 +100,12 @@ qt_add_qml_module(appPlantDoctor
         src/core/rtsp/rtsvideoworker.cpp
         src/core/rtsp/rtsvideooutput.h
         src/core/rtsp/rtsvideooutput.cpp
-        QML_FILES ui/features/home/screens/ImagePreviewScreen.qml
-        SOURCES src/core/synch/apiclient.h src/core/synch/apiclient.cpp
-        SOURCES src/core/synch/apiclient.h src/core/synch/apiclient.cpp
+        src/core/synch/apiclient.h
+        src/core/synch/apiclient.cpp
+        src/core/synch/apiclient.h
+        src/core/synch/apiclient.cpp
+        src/core/utills/appsettings.h
+        src/core/utills/appsettings.cpp
 
 
 

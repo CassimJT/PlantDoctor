@@ -16,6 +16,7 @@
 #include "src/core/mqtt/pnddevice.h"
 #include "src/core/synch/apiclient.h"
 #include "src/core/synch/cloudsynch.h"
+#include "src/core/utills/appsettings.h"
 
 int main(int argc, char *argv[])
 {
@@ -49,6 +50,9 @@ int main(int argc, char *argv[])
     // Don't create on stack, get the singleton instance instead
     CloudSynch* cloudSynch = CloudSynch::instance();
 
+    //AppSettings
+    AppSettings& appSettings = AppSettings::instance();
+
     // QML Engine
     QQmlApplicationEngine engine;
 
@@ -59,7 +63,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("DeviceConfigurator", &deviceConfigurator);
     engine.rootContext()->setContextProperty("DeviceModel", deviceModel);
     engine.rootContext()->setContextProperty("APIClient", &apiClient);
-    engine.rootContext()->setContextProperty("CloudSynch", cloudSynch);  // Pass the singleton pointer
+    engine.rootContext()->setContextProperty("CloudSynch", cloudSynch);
+    engine.rootContext()->setContextProperty("AppSettings", &appSettings);
 
     // Register enum for QML
     qmlRegisterUncreatableType<PNDDeviceState>(
