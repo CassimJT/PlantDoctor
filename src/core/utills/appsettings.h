@@ -13,8 +13,11 @@ public:
 
     static AppSettings& instance();
 
-    bool hasTakenSurvey(int classId);
-    void setSurveyTaken(int classId, bool taken);
+    QString varietyForClass(int classId) const;
+
+    void setVarietyForClass(int classId,const QString &variety);
+
+    bool hasVarietyForClass(int classId) const;
 
     bool isLoggedIn() const;
     void setLoggedIn(bool newIsLogedIn);
@@ -25,13 +28,14 @@ public:
     QString language() const;
     void setLanguage(const QString &newLanguage);
 
+    QString authToken() const;
+    void setAuthToken(const QString &token);
+
 signals:
     void isLogedInChanged();
 
 private:
-    bool m_isLogedIn;
-    int m_infarenceCounter;
-    QString m_language;
+
     QSettings settings;
 
 

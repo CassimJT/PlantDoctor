@@ -9,10 +9,11 @@
 APIClient::APIClient(QObject *parent)
     : QObject(parent)
     , m_nam(new QNetworkAccessManager(this))
-    , m_baseUrl("https://plantdoctor-api.onrender.com/api/inference")
+    , m_baseUrl("https://plantdoctor-api.onrender.com/api")
     , m_isloading(false)
 {
     connect(m_nam, &QNetworkAccessManager::finished, this, &APIClient::onReplyFinished);
+    m_authToken = AppSettings::instance().authToken();
 }
 
 APIClient::~APIClient()
@@ -66,7 +67,7 @@ void APIClient::createBatchInferences(const QJsonArray &inferencesArray,
     data["inferences"] = inferencesArray;
     data["batchSize"] = inferencesArray.size();
 
-    sendRequest("POST", "/batch", data, callback);
+    sendRequest("POST", "/inference/batch", data, callback);
 }
 
 void APIClient::sendRequest(const QString &method, const QString &endpoint,
@@ -319,4 +320,44 @@ void APIClient::createBatchInferencesFromJson(const QString &jsonArrayStr)
                               setIsloading(false);
                           }
                           );
+}
+//Auth
+void APIClient::login(const QString &email,const QString &location){
+    setIsloading(true);
+    QJsonObject data;
+    data["phone"] = email;
+     data["location"] = location;
+    sendRequest("POST","/auth/login",data,[this](bool success, const QJsonObject &response){
+            if (success && response.contains("token")) {
+                QString token =
+                    response["token"].toString();
+
+                setAuthToken(token);
+
+                AppSettings::instance()
+                    .setAuthToken(token);
+
+                AppSettings::instance()
+                    .setLoggedIn(true);
+            }
+
+            emit loginFinished(success, response);
+
+            setIsloading(false);
+        }
+        );
+}
+
+void APIClient::logout(){
+    m_authToken.clear();
+
+    AppSettings::instance()
+        .setAuthToken("");
+
+    AppSettings::instance()
+        .setLoggedIn(false);
+
+    emit authTokenChanged();
+
+    emit logoutFinished();
 }

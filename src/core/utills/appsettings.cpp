@@ -13,20 +13,23 @@ AppSettings &AppSettings::instance()
 }
 
 //Survey
-bool AppSettings::hasTakenSurvey(int classId)
-{
+QString AppSettings::varietyForClass(int classId) const{
     return settings.value(
-                       QString("survey/%1").arg(classId),
-                       false
-                       ).toBool();
+                       QString("variety/%1").arg(classId),
+                       ""
+                       ).toString();
 }
-
-void AppSettings::setSurveyTaken(int classId, bool taken)
-{
+void AppSettings::setVarietyForClass(int classId,const QString &variety){
     settings.setValue(
-        QString("survey/%1").arg(classId),
-        taken
+        QString("variety/%1").arg(classId),
+        variety
         );
+}
+bool AppSettings::hasVarietyForClass(int classId) const{
+    return !settings.value(
+                        QString("variety/%1")
+                            .arg(classId)
+                        ).toString().isEmpty();
 }
 //language
 QString AppSettings::language() const
@@ -60,4 +63,14 @@ bool AppSettings::isLoggedIn() const
 void AppSettings::setLoggedIn(bool loggedIn)
 {
     settings.setValue("auth/isLoggedIn", loggedIn);
+}
+
+QString AppSettings::authToken() const
+{
+    return settings.value("auth/token", "").toString();
+}
+
+void AppSettings::setAuthToken(const QString &token)
+{
+    settings.setValue("auth/token", token);
 }
