@@ -121,7 +121,7 @@ Popup {
             Text {
                 text: "If this persists, contact an expert via the hotlines."
                 color: "#667766"
-                font.pointSize: 11
+                font.pointSize: 12
                 font.italic: true
                 wrapMode: Text.WordWrap
                 width: parent.width

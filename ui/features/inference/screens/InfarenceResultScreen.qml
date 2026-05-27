@@ -297,7 +297,9 @@ Page {
                         color: confidence < 50 ? "red" : "green"
                         font.bold: true
                     }
+                   onClicked: surveyDrawer.open()
                 }
+
             }
         }
     }
@@ -397,6 +399,205 @@ Page {
             }
         }
     }
+    // the drawer for the survey starts here
+    Drawer {
+        id: surveyDrawer
+
+        // Slide up from the bottom of the screen
+        edge: Qt.BottomEdge
+        width: parent.width
+        // Set a height that perfectly fits our form content comfortably
+        height: parent.height * 0.40
+
+        // Property to receive the crop name dynamically from your backend/screen
+        property string currentCropName: "Crop"
+
+        // Signals to pass data back to your backend processing functions
+        signal surveySubmitted(string variety, string imageSource)
+        signal surveySkipped()
+
+        background: Rectangle {
+            color: "white"
+            radius: 24
+            // Clip to ensure content doesn't bleed past the rounded top corners
+            layer.enabled: true
+
+            // Visual indicator/handle at the top of the sheet showing it can be dragged down
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                y: 8
+                width: 40
+                height: 4
+                radius: 2
+                color: "#d4ddd0"
+            }
+        }
+
+        contentItem: ColumnLayout {
+            anchors {
+                fill: parent
+                margins: 24
+                topMargin: 20 // Extra room for the drag handle
+            }
+            spacing: 12
+
+            // ── Header Text ───────────────────────────────────────
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 4
+
+                Text {
+                    text: "Help us improve!"
+                    color: "#1a2e1a"
+                    font.pointSize: 16
+                    font.bold: true
+                }
+
+                Text {
+                    // Dynamically injecting the crop name from backend string
+                    text: "Please answer 2 quick questions about your " + surveyDrawer.currentCropName + " diagnosis."
+                    color: "#778877"
+                    font.pointSize: 11
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
+            }
+
+            // ── Input 1: Crop Variety ─────────────────────────────
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 6
+
+                Text {
+                    text: "What variety of " + surveyDrawer.currentCropName + " did you plant?"
+                    color: "#334433"
+                    font.pointSize: 13
+                    font.bold: true
+                }
+
+                TextField {
+                    id: varietyInput
+                    Layout.fillWidth: true
+                    placeholderText: "e.g. Local, Hybrid, kanyani..."
+                    selectByMouse: true
+
+                    background: Rectangle {
+                        implicitHeight: 46
+                        radius: 12
+                        color: varietyInput.activeFocus ? "#edf5e8" : "#f7faf6"
+                        border.color: varietyInput.activeFocus ? "#34c45a" : "#d4ddd0"
+                        border.width: varietyInput.activeFocus ? 2 : 1
+                    }
+                }
+            }
+
+            // ── Input 2: Image Source Dropdown ────────────────────
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 6
+
+                Text {
+                    text: "Where did you get the diagnosis image?"
+                    color: "#334433"
+                    font.pointSize: 13
+                    font.bold: true
+                }
+
+                ComboBox {
+                    id: sourceDropdown
+                    Layout.fillWidth: true
+                    model: ["Captured from the field", "From the internet"]
+
+                    delegate: ItemDelegate {
+                        width: sourceDropdown.width
+                        contentItem: Text {
+                            text: modelData
+                            color: "#334433"
+                            font.pointSize: 12
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        highlighted: sourceDropdown.highlightedIndex === index
+                    }
+
+                    background: Rectangle {
+                        implicitHeight: 46
+                        radius: 12
+                        color: "#f7faf6"
+                        border.color: "#d4ddd0"
+                        border.width: 1
+                    }
+                }
+            }
+
+
+
+            // ── Action Buttons ────────────────────────────────────
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 12
+
+
+                // Not Now / Skip Button
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 48
+                    radius: 24
+                    color: skipArea.containsPress ? "#e0e8da" : "#edf2e0"
+                    border.color: "#c8d4c0"
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Not now"
+                        color: "#556655"
+                        font.pointSize: 13
+                        font.bold: true
+                    }
+
+                    MouseArea {
+                        id: skipArea
+                        anchors.fill: parent
+                        onClicked: {
+                            surveyDrawer.surveySkipped()
+                            surveyDrawer.close()
+                        }
+                    }
+                }
+
+                // Submit Button
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 48
+                    radius: 24
+                    gradient: Gradient {
+                        orientation: Gradient.Horizontal
+                        GradientStop { position: 0.0; color: submitArea.containsPress ? "#2a9e48" : "#34c45a" }
+                        GradientStop { position: 1.0; color: submitArea.containsPress ? "#3dbf60" : "#5dde7a" }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Submit"
+                        color: "white"
+                        font.pointSize: 13
+                        font.bold: true
+                    }
+
+                    MouseArea {
+                        id: submitArea
+                        anchors.fill: parent
+                        onClicked: {
+                            // Pass parameters directly into the signal handler execution
+                            surveyDrawer.surveySubmitted(varietyInput.text, sourceDropdown.currentText)
+                            surveyDrawer.close()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     // pop up initialization
     SurveyPopUp {
         id: instructionDialog
@@ -441,5 +642,6 @@ Page {
         PropertyAnimation { target: roundBtn; property: "opacity"; to: 1; duration: timeDuration }
         PropertyAnimation { target: confiLabel; property: "opacity"; to: 1; duration: timeDuration }
     }
+
 
 }
