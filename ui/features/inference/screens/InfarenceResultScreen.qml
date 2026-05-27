@@ -7,8 +7,8 @@ Page {
     id: inferenceResultScreen
     topPadding: 30
 
-    property int timeDuration: 500
-    property int pauseDuration: 200
+    property int timeDuration: 250
+    property int pauseDuration: 150
 
     property string imagePath: ""
     property string plantName: InfarenceRunner.diseaseName
@@ -311,7 +311,7 @@ Page {
             right: parent.right
         }
         height: 80
-        color: "#f0f4ef"
+        color: "#edf2e0"
 
         Rectangle {
             anchors {

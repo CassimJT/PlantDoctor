@@ -54,6 +54,7 @@ public:
     Q_INVOKABLE bool setLanguage(const QString& languageCode);
     Q_INVOKABLE QStringList availableLanguages() const;
     Q_INVOKABLE QString currentLanguage() const;
+    Q_INVOKABLE void loadHistoryResult(int classIndex);
 
     float riskLevel() const;
     void setRiskLevel(float newRiskLevel);
