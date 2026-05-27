@@ -392,10 +392,14 @@ Page {
                 MouseArea {
                     id: shareArea
                     anchors.fill: parent
-                    onClicked: console.log("Share tapped")
+                    onClicked: instructionDialog.open()
                 }
             }
         }
+    }
+    // pop up initialization
+    SurveyPopUp {
+        id: instructionDialog
     }
 
     // ── Sequential Fade-In Animations ──

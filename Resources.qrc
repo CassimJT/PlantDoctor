@@ -33,5 +33,6 @@
         <file>assets/home/diagnosis.png</file>
         <file>assets/home/gallery.png</file>
         <file>assets/home/retake.png</file>
+        <file>ui/features/inference/components/SurveyPopUp.qml</file>
     </qresource>
 </RCC>
