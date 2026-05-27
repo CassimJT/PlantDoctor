@@ -297,7 +297,6 @@ Page {
                         color: confidence < 50 ? "red" : "green"
                         font.bold: true
                     }
-                   onClicked: surveyDrawer.open()
                 }
 
             }
@@ -394,12 +393,12 @@ Page {
                 MouseArea {
                     id: shareArea
                     anchors.fill: parent
-                    onClicked: instructionDialog.open()
+
                 }
             }
         }
     }
-    // the drawer for the survey starts here
+    // SURVEY DRAWER
     Drawer {
         id: surveyDrawer
 
