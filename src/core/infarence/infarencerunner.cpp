@@ -222,7 +222,7 @@ void InfarenceRunner::setConfidence(float newConfidence)
     if (qFuzzyCompare(m_confidence, newConfidence))
         return;
     m_confidence = newConfidence;
-    emit confidenceChanged();
+    emit confidenceChanged(newConfidence);
 }
 
 void InfarenceRunner::setClassIndex(int newClassIndex)

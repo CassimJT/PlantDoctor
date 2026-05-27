@@ -9,6 +9,9 @@
 *.so.*
 *.dll
 *.dylib
+*.qmltypes
+*_qmltyperegistrations.cpp
+*metatypes.json
 # Build directories
 build/
 build-*/
