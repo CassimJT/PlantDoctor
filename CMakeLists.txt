@@ -102,11 +102,6 @@ qt_add_qml_module(appPlantDoctor
         QML_FILES ui/features/home/screens/ImagePreviewScreen.qml
         SOURCES src/core/synch/apiclient.h src/core/synch/apiclient.cpp
 
-        QML_FILES ui/features/sensors/pages/TempeatureHumidity.qml
-        QML_FILES ui/features/sensors/pages/AirQuality.qml
-
-
-
 
 )
 
