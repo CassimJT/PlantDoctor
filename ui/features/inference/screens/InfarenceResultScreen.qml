@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import HistoryModel
+import "../components"
 
 Page {
     id: inferenceResultScreen
@@ -25,6 +26,32 @@ Page {
     Component.onCompleted: {
         fadeIn.start()
         fadeSequence.start()
+
+        // Check confidence after the screen loads
+        checkConfidenceAndShowSurvey()
+    }
+
+    // Function to check confidence and show survey
+    function checkConfidenceAndShowSurvey() {
+        // Wait a moment for the animations to complete
+        surveyTimer.start()
+    }
+    SurveyPopUp {
+        id: surveyPopUp
+    }
+
+    Timer {
+        id: surveyTimer
+        interval: 1000  // Wait 1 second after screen loads
+        repeat: false
+        onTriggered: {
+            if (confidence < 50) {
+                console.log("Confidence is low: " + confidence + "%. Opening survey...")
+                surveyPopUp.open()
+            } else {
+                console.log("Confidence is good: " + confidence + "%. No survey needed.")
+            }
+        }
     }
 
     PropertyAnimation {
@@ -398,6 +425,7 @@ Page {
             }
         }
     }
+
     // SURVEY DRAWER
     Drawer {
         id: surveyDrawer
@@ -409,7 +437,7 @@ Page {
         height: parent.height * 0.40
 
         // Property to receive the crop name dynamically from your backend/screen
-        property string currentCropName: "Crop"
+        property string currentCropName: plantName || "crop"
 
         // Signals to pass data back to your backend processing functions
         signal surveySubmitted(string variety, string imageSource)
@@ -424,7 +452,6 @@ Page {
             // Visual indicator/handle at the top of the sheet showing it can be dragged down
             Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
-
                 y: 8
                 width: 40
                 height: 4
@@ -529,13 +556,10 @@ Page {
                 }
             }
 
-
-
             // ── Action Buttons ────────────────────────────────────
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 12
-
 
                 // Not Now / Skip Button
                 Rectangle {
@@ -596,12 +620,6 @@ Page {
         }
     }
 
-
-    // pop up initialization
-    SurveyPopUp {
-        id: instructionDialog
-    }
-
     // ── Sequential Fade-In Animations ──
     SequentialAnimation {
         id: fadeSequence
@@ -641,6 +659,4 @@ Page {
         PropertyAnimation { target: roundBtn; property: "opacity"; to: 1; duration: timeDuration }
         PropertyAnimation { target: confiLabel; property: "opacity"; to: 1; duration: timeDuration }
     }
-
-
 }

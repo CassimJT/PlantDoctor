@@ -68,7 +68,7 @@ signals:
     void diseaseNameChanged();
     void descriptionChanged();
     void cureChanged();
-    void confidenceChanged();
+    void confidenceChanged(float value);
     void classIndexChanged();
     void isModelLoadedChanged();
     void infarenceFinished();
@@ -76,6 +76,7 @@ signals:
     void languageChanged(const QString& language);
 
     void riskLevelChanged();
+
 
 private:
     // Helper methods - declare these as private

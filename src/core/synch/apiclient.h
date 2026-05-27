@@ -9,6 +9,7 @@
 #include <functional>
 #include <QMap>
 #include <QVariantList>
+#include "src/core/utills/appsettings.h"
 
 class APIClient : public QObject
 {
@@ -55,6 +56,9 @@ public:
     Q_INVOKABLE void createBatchInferencesQml(const QVariantList &inferencesList);
     Q_INVOKABLE void createBatchInferencesFromJson(const QString &jsonArray);
 
+    Q_INVOKABLE void login(const QString &phone, const QString &location);
+    Q_INVOKABLE void logout();
+
     bool isloading() const;
     void setIsloading(bool newIsloading);
 
@@ -73,6 +77,9 @@ signals:
     // Batch result signals
     void batchCreateFinished(bool success, int totalCount, int successCount, QJsonObject response);
     void batchProgress(int current, int total, QString currentDisease);
+
+    void loginFinished(bool success, QJsonObject response);
+    void logoutFinished();
 
 private slots:
     void onReplyFinished(QNetworkReply *reply);
