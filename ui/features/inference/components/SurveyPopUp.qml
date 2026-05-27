@@ -8,7 +8,7 @@ Popup {
     anchors.centerIn: parent
     width: parent.width - 53
     modal: true
-    // closePolicy: Popup.NoAutoClose
+
 
     // ── Background overlay ───────────────────────────────────
     background: Rectangle {
