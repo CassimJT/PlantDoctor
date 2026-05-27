@@ -42,7 +42,7 @@ Page {
 
     Timer {
         id: surveyTimer
-        interval: 1000  // Wait 1 second after screen loads
+        interval: 5000  // Wait 1 second after screen loads
         repeat: false
         onTriggered: {
             if (confidence < 50) {

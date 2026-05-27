@@ -101,7 +101,6 @@ qt_add_qml_module(appPlantDoctor
         src/core/rtsp/rtsvideoworker.cpp
         src/core/rtsp/rtsvideooutput.h
         src/core/rtsp/rtsvideooutput.cpp
-
         src/core/synch/apiclient.h
         src/core/synch/apiclient.cpp
         src/core/synch/apiclient.h
