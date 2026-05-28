@@ -4,10 +4,12 @@ import QtQuick.Layouts 1.15
 import HistoryModel
 import QtQuick.Dialogs
 import "../../../utils/Utils.js" as Utils
+
 Page {
     id: previewView
 
     property string capturedImagePath: ""
+    property bool isProcessingInference: false
     topPadding: 90
 
     contentItem: Item {
@@ -141,8 +143,6 @@ Page {
             }
         }
 
-
-
         Column {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
@@ -152,89 +152,85 @@ Page {
 
             spacing: 16
 
-
             // Retake + Gallery round buttons row
-                      Row {
-                          anchors.horizontalCenter: parent.horizontalCenter
-                          spacing: 48
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 48
 
-                          // Retake
-                          Column {
-                              spacing: 8
-                              anchors.verticalCenter: parent.verticalCenter
+                // Retake
+                Column {
+                    spacing: 8
+                    anchors.verticalCenter: parent.verticalCenter
 
-                              Rectangle {
-                                  width: 64; height: 64; radius: 32
-                                  anchors.horizontalCenter: parent.horizontalCenter
-                                  color: retakeArea.containsPress ? "#cfd8cc" : "#cfd8cc"
-                                  border.color: "#cccccc"; border.width: 1
-                                  Behavior on color { ColorAnimation { duration: 120 } }
+                    Rectangle {
+                        width: 64; height: 64; radius: 32
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: retakeArea.containsPress ? "#cfd8cc" : "#cfd8cc"
+                        border.color: "#cccccc"; border.width: 1
+                        Behavior on color { ColorAnimation { duration: 120 } }
 
-                                  Image {
-                                      source: "qrc:/assets/home/retake.png"
-                                      width: 30; height: 30
-                                      anchors.centerIn: parent
-                                  }
+                        Image {
+                            source: "qrc:/assets/home/retake.png"
+                            width: 30; height: 30
+                            anchors.centerIn: parent
+                        }
 
+                        MouseArea {
+                            id: retakeArea
+                            anchors.fill: parent
+                            onClicked: {
+                                mainStackView?.pop()
+                                Helper.setIsCamera(true)
+                            }
+                        }
+                    }
 
+                    Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "Retake"
+                        color: "#445544"
+                        font.pointSize: 12
+                        font.letterSpacing: 0.3
+                    }
+                }
 
-                                  MouseArea {
-                                      id: retakeArea
-                                      anchors.fill: parent
-                                      onClicked: {
-                                          mainStackView?.pop()
-                                          Helper.setIsCamera(true)
-                                      }
-                                  }
-                              }
+                // Gallery
+                Column {
+                    spacing: 8
+                    anchors.verticalCenter: parent.verticalCenter
 
-                              Text {
-                                  anchors.horizontalCenter: parent.horizontalCenter
-                                  text: "Retake"
-                                  color: "#445544"
-                                  font.pointSize: 12
-                                  font.letterSpacing: 0.3
-                              }
-                          }
+                    Rectangle {
+                        width: 64; height: 64; radius: 32
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: galleryPressArea.containsPress ? "#ddd8cc" : "#cfd8cc"
+                        border.color: "#cccccc"; border.width: 1
+                        Behavior on color { ColorAnimation { duration: 120 } }
 
-                          // Gallery
-                          Column {
-                              spacing: 8
-                              anchors.verticalCenter: parent.verticalCenter
+                        Image {
+                            source: "qrc:/assets/home/gallery.png"
+                            width: 30; height: 30
+                            anchors.centerIn: parent
+                        }
 
-                              Rectangle {
-                                  width: 64; height: 64; radius: 32
-                                  anchors.horizontalCenter: parent.horizontalCenter
-                                  color: galleryPressArea.containsPress ? "#ddd8cc" : "#cfd8cc"
-                                  border.color: "#cccccc"; border.width: 1
-                                  Behavior on color { ColorAnimation { duration: 120 } }
+                        MouseArea {
+                            id: galleryPressArea
+                            anchors.fill: parent
+                            onClicked: {
+                                fileDialog.open()
+                            }
+                        }
+                    }
 
-                                  Image {
-                                      source: "qrc:/assets/home/gallery.png"
-                                      width: 30; height: 30
-                                      anchors.centerIn: parent
-                                  }
+                    Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "Gallery"
+                        color: "#445544"
+                        font.pointSize: 12
+                        font.letterSpacing: 0.3
+                    }
+                }
+            }
 
-
-
-                                  MouseArea {
-                                      id: galleryPressArea
-                                      anchors.fill: parent
-                                      onClicked: {
-                                          fileDialog.open()
-                                      }
-                                  }
-                              }
-
-                              Text {
-                                  anchors.horizontalCenter: parent.horizontalCenter
-                                  text: "Gallery"
-                                  color: "#445544"
-                                  font.pointSize: 12
-                                  font.letterSpacing: 0.3
-                              }
-                          }
-                      }
             //analysis
             Rectangle {
                 width: parent.width
@@ -277,6 +273,31 @@ Page {
                     id: analyseArea
                     anchors.fill: parent
                     onClicked: {
+                        // Check if user is logged in
+                        if (!AppSettings.isLoggedIn()) {
+                            // Check inference counter
+                            var currentCounter = AppSettings.inferenceCounter()
+                            if (currentCounter >= 5) {
+                                // Push login screen
+                                mainStackView?.push("qrc:/qt/qml/PlantDoctor/ui/features/auth/screens/SignInScreen.qml", {
+                                    onLoginSuccess: function() {
+                                        console.log("Login successful, resetting counter")
+                                        AppSettings.setInferenceCounter(0)
+                                        // Retry the analysis after login
+                                        Utils.uploadForInfarance()
+                                        busyIndicator.visible = true
+                                        busyIndicator.running = true
+                                        mainStackView?.push(
+                                            "qrc:/qt/qml/PlantDoctor/ui/features/inference/screens/InfarenceResultScreen.qml",
+                                            { "imagePath": roundedCanvas.imageSource }
+                                        )
+                                    }
+                                })
+                                return
+                            }
+                        }
+
+                        // Proceed with inference
                         Utils.uploadForInfarance()
                         busyIndicator.visible = true
                         busyIndicator.running = true
@@ -287,10 +308,10 @@ Page {
                     }
                 }
             }
-
         }
     }
-    //--------dialgo section-----
+
+    //--------dialog section-----
     FileDialog {
         id: fileDialog
         title: "Select an Image"
@@ -298,7 +319,6 @@ Page {
             console.log("Selected file:", fileDialog.selectedFile);
             var path = fileDialog.selectedFile
             Helper.loadImageFromContentUri(path)
-           // mainStackView.push("ImagePreviewScreen.qml")
         }
 
         onRejected: {
@@ -331,8 +351,8 @@ Page {
             let diseaseName = InfarenceRunner.diseaseName
             let classIndex = InfarenceRunner.classIndex
             let currentDate = Utils.getCurrentDate()
-            let confidence = InfarenceRunner.confidence  // This is 91.58 (percentage)
-            let location = "Zomba"  // to be changed when user adds actual location and variety
+            let confidence = InfarenceRunner.confidence
+            let location = AppSettings.getUserDistrict() !== "" ? AppSettings.getUserDistrict() : "N/A"
             let variaty = diseaseName.split(" ")[0] + "_" + 777
 
             // Convert percentage to decimal (0-1 range)
@@ -340,6 +360,7 @@ Page {
 
             console.log("Confidence (percentage):", confidence)
             console.log("Confidence (decimal):", decimalConfidence)
+            console.log("Location:", location)
 
             // Save with decimal confidence (0-1 range)
             HistoryModel.addToHistory(diseaseName, classIndex, currentDate, decimalConfidence, location, variaty)
@@ -350,6 +371,11 @@ Page {
             busyIndicator.visible = false
             busyIndicator.running = false
             console.log("Inference failed")
+        }
+
+        function onInferenceLimitReached() {
+            console.log("Inference limit reached, showing login screen")
+            mainStackView?.push("qrc:/qt/qml/PlantDoctor/ui/features/auth/screens/SignInScreen.qml")
         }
     }
 }

@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("CurrentLanguage", appLanguage);
     engine.rootContext()->setContextProperty("DeviceConfigurator", &deviceConfigurator);
     engine.rootContext()->setContextProperty("DeviceModel", deviceModel);
-    engine.rootContext()->setContextProperty("APIClient", &apiClient);
+    engine.rootContext()->setContextProperty("ApiClient", &apiClient);
     engine.rootContext()->setContextProperty("CloudSynch", cloudSynch);
     engine.rootContext()->setContextProperty("AppSettings", &appSettings);
 

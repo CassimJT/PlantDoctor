@@ -21,6 +21,11 @@
 #include <executorch/extension/tensor/tensor.h>
 
 #include "diseaseinfomanager.h"
+// Remove this line from header, we'll forward declare instead
+// #include "appsettings.h"
+
+// Forward declaration
+class AppSettings;
 
 // Use the correct namespaces
 using TensorPtr = std::shared_ptr<executorch::aten::Tensor>;
@@ -56,6 +61,12 @@ public:
     Q_INVOKABLE QString currentLanguage() const;
     Q_INVOKABLE void loadHistoryResult(int classIndex);
 
+    // Inference counter and survey management
+    Q_INVOKABLE void checkInferenceLimit();
+    Q_INVOKABLE void markSurveyCompleted(int classIndex);
+    Q_INVOKABLE bool hasTakenSurvey(int classIndex) const;
+    Q_INVOKABLE void resetInferenceCounter();
+
     float riskLevel() const;
     void setRiskLevel(float newRiskLevel);
 
@@ -74,12 +85,12 @@ signals:
     void infarenceFinished();
     void infarenceFailed(const QString& error);
     void languageChanged(const QString& language);
-
     void riskLevelChanged();
-
+    void inferenceLimitReached();
+    void needsSurvey(int classIndex);
 
 private:
-    // Helper methods - declare these as private
+    // Helper methods
     void setDiseaseName(const QString &newDiseaseName);
     void setDescription(const QString &newDescription);
     void setCure(const QString &newCure);
@@ -109,7 +120,6 @@ private:
     // Constants
     static constexpr int MODEL_INPUT_SIZE = 224;
     static constexpr int NUM_CLASSES = 38;
-
 };
 
 #endif // INFARENCERUNNER_H

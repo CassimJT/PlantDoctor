@@ -68,7 +68,6 @@ qt_add_qml_module(appPlantDoctor
         ui/features/sensors/screens/Hotlines.qml
         ui/features/home/screens/CameraScreen.qml
         ui/features/auth/screens/SignInScreen.qml
-        ui/features/auth/screens/SignUpScreen.qml
         ui/components/DHTMeter.qml
         ui/features/devices/DevicesPage.qml
         ui/features/devices/componets/DeviceManu.qml

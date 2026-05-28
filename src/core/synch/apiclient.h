@@ -58,6 +58,8 @@ public:
 
     Q_INVOKABLE void login(const QString &phone, const QString &location);
     Q_INVOKABLE void logout();
+    // Add to public section of APIClient class
+    Q_INVOKABLE void registerUser(const QString &phoneNumber, const QString &district);
 
     bool isloading() const;
     void setIsloading(bool newIsloading);

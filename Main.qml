@@ -111,7 +111,7 @@ ApplicationWindow {
 
     // Handle batch sync result
     Connections {
-        target: APIClient
+        target: ApiClient
         function onBatchCreateFinished(success, totalCount, successCount, response) {
             if (success) {
                 console.log("Sync successful - Total:", totalCount, "Succeeded:", successCount)

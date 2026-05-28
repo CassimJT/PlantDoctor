@@ -164,9 +164,9 @@ Drawer {
                 }
             }
             Text {
-                id: user_email
-                text: qsTr("SignIn")
-                color: "#333"
+                id: loginIndicator
+                text: AppSettings.isLoggedIn() ? "Logout" : "Sign In"
+                color: AppSettings.isLoggedIn() ? "#d32f2f" : "#333"
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
@@ -180,9 +180,30 @@ Drawer {
             margins: 8
         }
         //move to SigninPage if not alrady signed in
-        onClicked:  {
-             mainLoader.item && mainLoader.item.mainStackView.push("../../auth/screens/SignInScreen.qml")
-            drawer.close()
+        onClicked: {
+            if (AppSettings.isLoggedIn()) {
+                // Logout
+                AppSettings.setLoggedIn(false)
+                AppSettings.setAuthToken("")
+                AppSettings.setUserData("", "")
+                AppSettings.setInferenceCounter(0)
+
+                // Update the text display
+                loginIndicator.text = "Sign In"
+                loginIndicator.color = "#333"
+
+                drawer.close()
+                console.log("User logged out")
+            } else {
+                // Sign In
+                mainLoader.item && mainLoader.item.mainStackView.push("../../auth/screens/SignInScreen.qml", {
+                    onLoginSuccess: function() {
+                        loginIndicator.text = "Logout"
+                        loginIndicator.color = "#d32f2f"
+                        drawer.close()
+                    }
+                })
+            }
         }
     }
 }

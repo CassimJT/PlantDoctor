@@ -1,4 +1,5 @@
 #include "infarencerunner.h"
+#include "../utills/appsettings.h"
 #include <QCoreApplication>
 
 using namespace executorch::extension;
@@ -78,6 +79,31 @@ void InfarenceRunner::updateDiseaseInfo(int classId)
     setDescription(info.description);
     setCure(info.cure);
     setRiskLevel(info.riskLevel);
+}
+
+void InfarenceRunner::checkInferenceLimit()
+{
+    int counter = AppSettings::instance().inferenceCounter();
+
+    // Check if user is not logged in and has reached 5 inferences
+    if (!AppSettings::instance().isLoggedIn() && counter >= 5) {
+        emit inferenceLimitReached();
+    }
+}
+
+void InfarenceRunner::markSurveyCompleted(int classIndex)
+{
+    AppSettings::instance().setSurveyCompleted(classIndex, true);
+}
+
+bool InfarenceRunner::hasTakenSurvey(int classIndex) const
+{
+    return AppSettings::instance().hasSurveyCompleted(classIndex);
+}
+
+void InfarenceRunner::resetInferenceCounter()
+{
+    AppSettings::instance().setInferenceCounter(0);
 }
 
 void InfarenceRunner::classifyImage(const QString &imageDataBase64)
@@ -183,6 +209,27 @@ void InfarenceRunner::classifyImage(const QString &imageDataBase64)
     float topConfidence = *maxIt * 100.0f;
 
     qDebug() << "Top class index:" << topClassIdx << "Confidence:" << topConfidence << "%";
+
+    // Check if user is logged in
+    bool isLoggedIn = AppSettings::instance().isLoggedIn();
+
+    if (!isLoggedIn) {
+        // Increment inference counter for non-logged in users
+        int currentCount = AppSettings::instance().inferenceCounter();
+        AppSettings::instance().setInferenceCounter(currentCount + 1);
+
+        qDebug() << "Inference counter:" << currentCount + 1 << "/5";
+
+        // Check if limit reached
+        if (currentCount + 1 >= 5) {
+            emit inferenceLimitReached();
+        }
+    }
+
+    // Check if user needs to take survey for this disease class
+    if (!hasTakenSurvey(topClassIdx)) {
+        emit needsSurvey(topClassIdx);
+    }
 
     // Update results
     setConfidence(topConfidence);

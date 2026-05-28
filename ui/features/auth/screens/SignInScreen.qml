@@ -3,10 +3,12 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Page {
-    id:signInScreen
+    id: signInScreen
     width: 360
     height: 800
     background: Rectangle { color: "#e8efe6" }
+
+    property var onLoginSuccess: null
 
     Flickable {
         anchors.fill: parent
@@ -42,6 +44,17 @@ Page {
                 font.letterSpacing: 0.3
             }
 
+            // Sign in message
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: "Sign in for uninterrupted use"
+                font.pixelSize: 14
+                color: "#666"
+                font.italic: true
+                visible: !AppSettings.isLoggedIn()
+                Layout.topMargin: 8
+            }
+
             Item { Layout.preferredHeight: 70 }
 
             // ── Card ─────────────────────────────────────────────────────────
@@ -55,168 +68,131 @@ Page {
                 border.color: "#000000"
                 border.width: 1
 
-
                 ColumnLayout {
                     id: cardColumn
                     anchors {
-                        top: parent.top; left: parent.left; right: parent.right
-                        topMargin: 28; leftMargin: 20; rightMargin: 20
+                        top: parent.top
+                        left: parent.left
+                        right: parent.right
+                        topMargin: 28
+                        leftMargin: 20
+                        rightMargin: 20
                     }
                     spacing: 16
 
-                    // ── Continue with Google ──────────────────────────────────
-                    Rectangle {
-                        Layout.fillWidth: true
-                        height: 50
-                        radius: 12
-                        color: googleMA.pressed ? "#F0F0F0" : "#FAFAFA"
-                        border.color: "#000000"
-                        border.width: 1
-
-                        Behavior on color { ColorAnimation { duration: 120 } }
-
-                        Row {
-                            anchors.centerIn: parent
-                            spacing: 10
-
-                            Item {
-                                width: 22; height: 22
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                Canvas {
-                                    anchors.fill: parent
-                                    onPaint: {
-                                        var ctx = getContext("2d")
-                                        ctx.clearRect(0, 0, width, height)
-                                        var cx = width / 2
-                                        var cy = height / 2
-                                        var r  = width / 2
-
-                                        ctx.beginPath()
-                                        ctx.moveTo(cx, cy)
-                                        ctx.arc(cx, cy, r, -0.5, 1.1)
-                                        ctx.closePath()
-                                        ctx.fillStyle = "#4285F4"
-                                        ctx.fill()
-
-                                        ctx.beginPath()
-                                        ctx.moveTo(cx, cy)
-                                        ctx.arc(cx, cy, r, 1.1, 2.2)
-                                        ctx.closePath()
-                                        ctx.fillStyle = "#EA4335"
-                                        ctx.fill()
-
-                                        ctx.beginPath()
-                                        ctx.moveTo(cx, cy)
-                                        ctx.arc(cx, cy, r, 2.2, 3.8)
-                                        ctx.closePath()
-                                        ctx.fillStyle = "#FBBC05"
-                                        ctx.fill()
-
-                                        ctx.beginPath()
-                                        ctx.moveTo(cx, cy)
-                                        ctx.arc(cx, cy, r, 3.8, -0.5)
-                                        ctx.closePath()
-                                        ctx.fillStyle = "#34A853"
-                                        ctx.fill()
-
-                                        ctx.beginPath()
-                                        ctx.arc(cx, cy, r * 0.58, 0, Math.PI * 2)
-                                        ctx.fillStyle = "#FAFAFA"
-                                        ctx.fill()
-
-                                        ctx.fillStyle = "#4285F4"
-                                        ctx.fillRect(cx, cy - r * 0.18, r * 0.95, r * 0.36)
-
-                                        ctx.beginPath()
-                                        ctx.arc(cx, cy, r * 0.58, 0, Math.PI * 2)
-                                        ctx.fillStyle = "#FAFAFA"
-                                        ctx.fill()
-
-                                        ctx.font = "bold 11px sans-serif"
-                                        ctx.fillStyle = "#4285F4"
-                                        ctx.textAlign = "center"
-                                        ctx.textBaseline = "middle"
-                                        ctx.fillText("G", cx + 0.5, cy + 0.5)
-                                    }
-                                }
-                            }
-
-                            Text {
-                                text: "Continue with Google"
-                                font.pixelSize: 14
-                                color: "#000000"
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        MouseArea {
-                            id: googleMA
-                            anchors.fill: parent
-                            onClicked: console.log("Google sign-in tapped")
-                        }
-                    }
-
-                    // ── Divider ───────────────────────────────────────────────
-                    Row {
-                        Layout.fillWidth: true
-                        spacing: 8
-
-                        Rectangle {
-                            width: (cardColumn.width - 36) / 2
-                            height: 1
-                            color: "#000000"
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        Text {
-                            text: "or"
-                            font.pixelSize: 12
-                            color: "#000000"
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        Rectangle {
-                            width: (cardColumn.width - 36) / 2
-                            height: 1
-                            color: "#000000"
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-
-                    // ── Email / Phone field ───────────────────────────────────
+                    // ── Phone Number field ───────────────────────────────────
                     Rectangle {
                         Layout.fillWidth: true
                         height: 56
                         radius: 12
                         color: "#FAFAFA"
-                        border.color: emailField.activeFocus ? "#8FAF8F" : "#000000"
-                        border.width: emailField.activeFocus ? 1.5 : 1
+                        border.color: phoneField.activeFocus ? "#8FAF8F" : "#000000"
+                        border.width: phoneField.activeFocus ? 1.5 : 1
+                        enabled: !busyIndicator.visible
 
                         Behavior on border.color { ColorAnimation { duration: 150 } }
 
                         Text {
-                            id: emailLabel
-                            text: "Email or phone number"
+                            id: phoneLabel
+                            text: "Phone number"
                             color: "#000000"
                             font.pixelSize: 14
                             anchors.verticalCenter: parent.verticalCenter
                             x: 16
-                            visible: emailField.text.length === 0 && !emailField.activeFocus
+                            visible: phoneField.text.length === 0 && !phoneField.activeFocus
                         }
 
                         TextField {
-                            id: emailField
+                            id: phoneField
                             anchors {
                                 fill: parent
-                                leftMargin: 16; rightMargin: 14
+                                leftMargin: 16
+                                rightMargin: 14
                             }
                             placeholderText: ""
                             color: "#000000"
                             font.pixelSize: 14
                             background: Item {}
-                            inputMethodHints: Qt.ImhEmailCharactersOnly
+                            inputMethodHints: Qt.ImhDialableCharactersOnly
                             verticalAlignment: TextInput.AlignVCenter
+                            enabled: !busyIndicator.visible
                         }
                     }
+
+                    // ── District / Location field ─────────────────────────────
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 56
+                        radius: 12
+                        color: "#FAFAFA"
+                        border.color: districtField.activeFocus ? "#8FAF8F" : "#000000"
+                        border.width: districtField.activeFocus ? 1.5 : 1
+                        enabled: !busyIndicator.visible
+
+                        Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                        Text {
+                            id: districtLabel
+                            text: "District"
+                            color: "#000000"
+                            font.pixelSize: 14
+                            anchors.verticalCenter: parent.verticalCenter
+                            x: 16
+                            visible: districtField.text.length === 0 && !districtField.activeFocus
+                        }
+
+                        TextField {
+                            id: districtField
+                            anchors {
+                                fill: parent
+                                leftMargin: 16
+                                rightMargin: 14
+                            }
+                            placeholderText: ""
+                            color: "#000000"
+                            font.pixelSize: 14
+                            background: Item {}
+                            verticalAlignment: TextInput.AlignVCenter
+                            enabled: !busyIndicator.visible
+                        }
+                    }
+
+                    // Error message
+                    Text {
+                        id: errorMessage
+                        text: ""
+                        color: "red"
+                        font.pixelSize: 12
+                        visible: false
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+
+                    // Loading indicator and message
+                    Column {
+                        Layout.fillWidth: true
+                        spacing: 8
+                        visible: busyIndicator.visible
+                        Layout.alignment: Qt.AlignHCenter
+
+                        BusyIndicator {
+                            id: busyIndicator
+                            visible: false
+                            running: false
+                            Layout.alignment: Qt.AlignHCenter
+                            width: 40
+                            height: 40
+                        }
+
+                        Text {
+                            text: "Signing you in..."
+                            font.pixelSize: 12
+                            color: "#666"
+                            font.italic: true
+                            Layout.alignment: Qt.AlignHCenter
+                            visible: busyIndicator.visible
+                        }
+                    }
+
                     Item { Layout.preferredHeight: 4 }
 
                     // ── Continue button ───────────────────────────────────────
@@ -225,12 +201,13 @@ Page {
                         height: 52
                         radius: 14
                         color: continueMA.pressed ? "#7A9E7E" : "#8FAF8F"
+                        opacity: busyIndicator.visible ? 0.6 : 1.0
 
                         Behavior on color { ColorAnimation { duration: 120 } }
 
                         Text {
                             anchors.centerIn: parent
-                            text: "Continue"
+                            text: busyIndicator.visible ? "Please wait..." : "Continue"
                             font.family: "Georgia"
                             font.pixelSize: 16
                             color: "#FFFFFF"
@@ -240,47 +217,69 @@ Page {
                         MouseArea {
                             id: continueMA
                             anchors.fill: parent
+                            enabled: !busyIndicator.visible
                             onClicked: {
-                            mainStackView?.push("home/screens/HomeScreen.qml")
-                            }
-                        }
-                    }
-                    Item { Layout.preferredHeight: 2 }
+                                var phone = phoneField.text.trim()
+                                var district = districtField.text.trim()
 
-                    // ── Create account ────────────────────────────────────────
-                    Row {
-                        Layout.alignment: Qt.AlignHCenter
-                        spacing: 4
-
-                        Text {
-                            text: "Don't have an account?"
-                            font.pixelSize: 13
-                            color: "#000000"
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        Text {
-                            text: "Create account"
-                            font.pixelSize: 13
-                            font.bold: true
-                            color: "#5A9E6F"
-                            font.underline: true
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    mainStackView?.push("SignUpScreen.qml")
+                                if (phone.length === 0) {
+                                    errorMessage.text = "Please enter your phone number"
+                                    errorMessage.visible = true
+                                    return
                                 }
+
+                                if (district.length === 0) {
+                                    errorMessage.text = "Please enter your district"
+                                    errorMessage.visible = true
+                                    return
+                                }
+
+                                errorMessage.visible = false
+
+                                // Show busy indicator
+                                busyIndicator.visible = true
+                                busyIndicator.running = true
+
+                                // Register user
+                                ApiClient.registerUser(phone, district)
                             }
                         }
                     }
-
 
                     Item { Layout.preferredHeight: 8 }
                 }
             }
 
             Item { Layout.preferredHeight: 40 }
+        }
+    }
+
+    Connections {
+        target: ApiClient
+
+        function onLoginFinished(success, response) {
+            // Hide busy indicator
+            busyIndicator.visible = false
+            busyIndicator.running = false
+
+            if (success) {
+                console.log("Registration successful!")
+                AppSettings.setInferenceCounter(0)
+                // Call success callback if provided
+                if (signInScreen.onLoginSuccess) {
+                    signInScreen.onLoginSuccess()
+                }
+
+                // Go back to previous screen
+                if (mainStackView) {
+                    mainStackView.pop()
+                }
+            } else {
+                var message = response.message ? response.message : "Registration failed"
+                errorMessage.text = message
+                errorMessage.visible = true
+                console.log("Registration failed:", message)
+            }
         }
     }
 }

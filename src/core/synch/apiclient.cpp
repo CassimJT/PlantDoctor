@@ -326,26 +326,47 @@ void APIClient::login(const QString &email,const QString &location){
     setIsloading(true);
     QJsonObject data;
     data["phone"] = email;
-     data["location"] = location;
+    data["location"] = location;
     sendRequest("POST","/auth/login",data,[this](bool success, const QJsonObject &response){
-            if (success && response.contains("token")) {
-                QString token =
-                    response["token"].toString();
+        if (success && response.contains("token")) {
+            QString token =
+                response["token"].toString();
 
-                setAuthToken(token);
+            setAuthToken(token);
 
-                AppSettings::instance()
-                    .setAuthToken(token);
+            AppSettings::instance()
+                .setAuthToken(token);
 
-                AppSettings::instance()
-                    .setLoggedIn(true);
-            }
-
-            emit loginFinished(success, response);
-
-            setIsloading(false);
+            AppSettings::instance()
+                .setLoggedIn(true);
         }
-        );
+
+        emit loginFinished(success, response);
+
+        setIsloading(false);
+    }
+                );
+}
+// Add this method to APIClient.cpp
+void APIClient::registerUser(const QString &phoneNumber, const QString &district)
+{
+    setIsloading(true);
+    QJsonObject data;
+    data["phoneNumber"] = phoneNumber;
+    data["district"] = district;
+
+    sendRequest("POST", "/auth/login/register", data,
+                [this, phoneNumber, district](bool success, const QJsonObject &response) {
+                    if (success) {
+                        // Just save locally - NO TOKENS
+                        AppSettings::instance().setUserData(phoneNumber, district);
+                        AppSettings::instance().setLoggedIn(true);
+                        AppSettings::instance().setInferenceCounter(0);
+                    }
+                    emit loginFinished(success, response);
+                    setIsloading(false);
+                }
+                );
 }
 
 void APIClient::logout(){

@@ -7,38 +7,41 @@
 class AppSettings : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit AppSettings(QObject *parent = nullptr);
-
     static AppSettings& instance();
 
-    QString varietyForClass(int classId) const;
+    // Survey methods
+    Q_INVOKABLE QString varietyForClass(int classId) const;
+    Q_INVOKABLE void setVarietyForClass(int classId, const QString &variety);
+    Q_INVOKABLE bool hasVarietyForClass(int classId) const;
 
-    void setVarietyForClass(int classId,const QString &variety);
+    // Language methods
+    Q_INVOKABLE QString language() const;
+    Q_INVOKABLE void setLanguage(const QString &newLanguage);
 
-    bool hasVarietyForClass(int classId) const;
+    // Inference counter methods
+    Q_INVOKABLE int inferenceCounter() const;
+    Q_INVOKABLE void setInferenceCounter(int newInferenceCounter);
 
-    bool isLoggedIn() const;
-    void setLoggedIn(bool newIsLogedIn);
+    // Auth methods
+    Q_INVOKABLE bool isLoggedIn() const;
+    Q_INVOKABLE void setLoggedIn(bool loggedIn);
+    Q_INVOKABLE QString authToken() const;
+    Q_INVOKABLE void setAuthToken(const QString &token);
 
-    int inferenceCounter() const;
-    void setInferenceCounter(int newInfarenceCounter);
+    // Survey completion methods
+    Q_INVOKABLE bool hasSurveyCompleted(int classId) const;
+    Q_INVOKABLE void setSurveyCompleted(int classId, bool completed);
 
-    QString language() const;
-    void setLanguage(const QString &newLanguage);
-
-    QString authToken() const;
-    void setAuthToken(const QString &token);
-
-signals:
-    void isLogedInChanged();
+    // User data methods
+    Q_INVOKABLE void setUserData(const QString& phoneNumber, const QString& district);
+    Q_INVOKABLE QString getUserPhone() const;
+    Q_INVOKABLE QString getUserDistrict() const;
+    Q_INVOKABLE bool hasUserData() const;
 
 private:
-
+    explicit AppSettings(QObject *parent = nullptr);
     QSettings settings;
-
-
 };
 
 #endif // APPSETTINGS_H
