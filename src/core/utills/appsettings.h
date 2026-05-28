@@ -39,6 +39,9 @@ public:
     Q_INVOKABLE QString getUserDistrict() const;
     Q_INVOKABLE bool hasUserData() const;
 
+signals:
+    void inferenceCounterChanged();
+
 private:
     explicit AppSettings(QObject *parent = nullptr);
     QSettings settings;

@@ -204,6 +204,19 @@ Drawer {
                     }
                 })
             }
+            drawer.close()
         }
+    }
+    Connections {
+        target: ApiClient
+        // In SignInScreen.qml Connections for ApiClient
+        function onLoginFinished(success, response) {
+            if (success) {
+               loginIndicator.text = "Logout"
+            } else {
+              loginIndicator.text = "Sign In"
+            }
+        }
+
     }
 }

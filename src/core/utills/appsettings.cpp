@@ -57,6 +57,7 @@ void AppSettings::setInferenceCounter(int newInferenceCounter)
         "app/inferenceCounter",
         newInferenceCounter
         );
+    emit inferenceCounterChanged();
 }
 
 //auth

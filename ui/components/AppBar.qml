@@ -81,7 +81,7 @@ Item {
                             x = dotedmenu.width - width
                             y = dotedmenu.height
                         }
-
+                        /*
                         MenuItem {
                             icon.source: "qrc:/assets/appbar/dashboard.svg"
                             text: qsTr("Sensors")
@@ -99,7 +99,7 @@ Item {
                                 mainLoader.item && mainLoader.item.mainStackView.push("../features/sensors/screens/LiveMonitorScreen.qml")
 
                             }
-                        }
+                        }*/
 
                         MenuSeparator{}
 

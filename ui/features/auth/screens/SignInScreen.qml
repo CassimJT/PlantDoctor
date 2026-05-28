@@ -88,7 +88,7 @@ Page {
                         color: "#FAFAFA"
                         border.color: phoneField.activeFocus ? "#8FAF8F" : "#000000"
                         border.width: phoneField.activeFocus ? 1.5 : 1
-                        enabled: !busyIndicator.visible
+                        enabled: !ApiClient.isloading
 
                         Behavior on border.color { ColorAnimation { duration: 150 } }
 
@@ -115,7 +115,7 @@ Page {
                             background: Item {}
                             inputMethodHints: Qt.ImhDialableCharactersOnly
                             verticalAlignment: TextInput.AlignVCenter
-                            enabled: !busyIndicator.visible
+                            enabled: !ApiClient.isloading
                         }
                     }
 
@@ -127,7 +127,7 @@ Page {
                         color: "#FAFAFA"
                         border.color: districtField.activeFocus ? "#8FAF8F" : "#000000"
                         border.width: districtField.activeFocus ? 1.5 : 1
-                        enabled: !busyIndicator.visible
+                        enabled: !ApiClient.isloading
 
                         Behavior on border.color { ColorAnimation { duration: 150 } }
 
@@ -153,7 +153,7 @@ Page {
                             font.pixelSize: 14
                             background: Item {}
                             verticalAlignment: TextInput.AlignVCenter
-                            enabled: !busyIndicator.visible
+                            enabled: !ApiClient.isloading
                         }
                     }
 
@@ -171,13 +171,13 @@ Page {
                     Column {
                         Layout.fillWidth: true
                         spacing: 8
-                        visible: busyIndicator.visible
+                        visible: ApiClient.isloading
                         Layout.alignment: Qt.AlignHCenter
 
                         BusyIndicator {
                             id: busyIndicator
-                            visible: false
-                            running: false
+                            visible: ApiClient.isloading
+                            running: ApiClient.isloading
                             Layout.alignment: Qt.AlignHCenter
                             width: 40
                             height: 40
@@ -189,7 +189,7 @@ Page {
                             color: "#666"
                             font.italic: true
                             Layout.alignment: Qt.AlignHCenter
-                            visible: busyIndicator.visible
+                            visible: ApiClient.isloading
                         }
                     }
 
@@ -201,13 +201,13 @@ Page {
                         height: 52
                         radius: 14
                         color: continueMA.pressed ? "#7A9E7E" : "#8FAF8F"
-                        opacity: busyIndicator.visible ? 0.6 : 1.0
+                        opacity: ApiClient.isloading ? 0.6 : 1.0
 
                         Behavior on color { ColorAnimation { duration: 120 } }
 
                         Text {
                             anchors.centerIn: parent
-                            text: busyIndicator.visible ? "Please wait..." : "Continue"
+                            text: ApiClient.isloading ? "Please wait..." : "Continue"
                             font.family: "Georgia"
                             font.pixelSize: 16
                             color: "#FFFFFF"
@@ -217,7 +217,7 @@ Page {
                         MouseArea {
                             id: continueMA
                             anchors.fill: parent
-                            enabled: !busyIndicator.visible
+                            enabled: !ApiClient.isloading
                             onClicked: {
                                 var phone = phoneField.text.trim()
                                 var district = districtField.text.trim()
@@ -236,10 +236,6 @@ Page {
 
                                 errorMessage.visible = false
 
-                                // Show busy indicator
-                                busyIndicator.visible = true
-                                busyIndicator.running = true
-
                                 // Register user
                                 ApiClient.registerUser(phone, district)
                             }
@@ -256,21 +252,13 @@ Page {
 
     Connections {
         target: ApiClient
-
+        // In SignInScreen.qml Connections for ApiClient
         function onLoginFinished(success, response) {
-            // Hide busy indicator
-            busyIndicator.visible = false
-            busyIndicator.running = false
-
             if (success) {
                 console.log("Registration successful!")
                 AppSettings.setInferenceCounter(0)
-                // Call success callback if provided
-                if (signInScreen.onLoginSuccess) {
-                    signInScreen.onLoginSuccess()
-                }
 
-                // Go back to previous screen
+                // Pop back to previous screen
                 if (mainStackView) {
                     mainStackView.pop()
                 }
@@ -281,5 +269,7 @@ Page {
                 console.log("Registration failed:", message)
             }
         }
+
     }
+
 }

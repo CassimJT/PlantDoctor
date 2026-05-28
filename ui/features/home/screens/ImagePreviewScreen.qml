@@ -10,6 +10,7 @@ Page {
 
     property string capturedImagePath: ""
     property bool isProcessingInference: false
+    property bool pendingAnalysis: false  // Track if analysis was pending login
     topPadding: 90
 
     contentItem: Item {
@@ -179,6 +180,7 @@ Page {
                             id: retakeArea
                             anchors.fill: parent
                             onClicked: {
+                                pendingAnalysis = false
                                 mainStackView?.pop()
                                 Helper.setIsCamera(true)
                             }
@@ -216,6 +218,7 @@ Page {
                             id: galleryPressArea
                             anchors.fill: parent
                             onClicked: {
+                                pendingAnalysis = false
                                 fileDialog.open()
                             }
                         }
@@ -278,37 +281,31 @@ Page {
                             // Check inference counter
                             var currentCounter = AppSettings.inferenceCounter()
                             if (currentCounter >= 5) {
+                                // Set flag that we need to retry analysis after login
+                                pendingAnalysis = true
                                 // Push login screen
-                                mainStackView?.push("qrc:/qt/qml/PlantDoctor/ui/features/auth/screens/SignInScreen.qml", {
-                                    onLoginSuccess: function() {
-                                        console.log("Login successful, resetting counter")
-                                        AppSettings.setInferenceCounter(0)
-                                        // Retry the analysis after login
-                                        Utils.uploadForInfarance()
-                                        busyIndicator.visible = true
-                                        busyIndicator.running = true
-                                        mainStackView?.push(
-                                            "qrc:/qt/qml/PlantDoctor/ui/features/inference/screens/InfarenceResultScreen.qml",
-                                            { "imagePath": roundedCanvas.imageSource }
-                                        )
-                                    }
-                                })
+                                mainStackView?.push("qrc:/qt/qml/PlantDoctor/ui/features/auth/screens/SignInScreen.qml")
                                 return
                             }
                         }
 
                         // Proceed with inference
-                        Utils.uploadForInfarance()
-                        busyIndicator.visible = true
-                        busyIndicator.running = true
-                        mainStackView?.push(
-                            "qrc:/qt/qml/PlantDoctor/ui/features/inference/screens/InfarenceResultScreen.qml",
-                            { "imagePath": roundedCanvas.imageSource }
-                        )
+                        startAnalysis()
                     }
                 }
             }
         }
+    }
+
+    // Function to start analysis
+    function startAnalysis() {
+        Utils.uploadForInfarance()
+        busyIndicator.visible = true
+        busyIndicator.running = true
+        mainStackView?.push(
+            "qrc:/qt/qml/PlantDoctor/ui/features/inference/screens/InfarenceResultScreen.qml",
+            { "imagePath": roundedCanvas.imageSource }
+        )
     }
 
     //--------dialog section-----
@@ -375,7 +372,26 @@ Page {
 
         function onInferenceLimitReached() {
             console.log("Inference limit reached, showing login screen")
+            pendingAnalysis = true
             mainStackView?.push("qrc:/qt/qml/PlantDoctor/ui/features/auth/screens/SignInScreen.qml")
+        }
+    }
+
+    // Handle returning from login screen
+    Connections {
+        target: mainStackView
+
+        function onCurrentItemChanged() {
+            // If we popped back to this screen and have pending analysis
+            if (mainStackView.currentItem === previewView && pendingAnalysis) {
+                pendingAnalysis = false
+                // Reset counter after successful login
+                if (AppSettings.isLoggedIn()) {
+                    AppSettings.setInferenceCounter(0)
+                    // Retry the analysis
+                    startAnalysis()
+                }
+            }
         }
     }
 }

@@ -106,7 +106,6 @@ qt_add_qml_module(appPlantDoctor
         src/core/synch/apiclient.cpp
         src/core/utills/appsettings.h
         src/core/utills/appsettings.cpp
-
 )
 
 # ─────────────────────────────────────────────────────────────

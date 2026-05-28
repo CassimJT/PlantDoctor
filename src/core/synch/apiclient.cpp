@@ -258,7 +258,7 @@ void APIClient::createBatchInferencesQml(const QVariantList &inferencesList)
     if (inferencesList.isEmpty()) {
         emit networkError("Cannot sync empty batch");
         emit batchCreateFinished(false, 0, 0, QJsonObject());
-        return;
+        return;  // No loading state to reset since we never set it
     }
 
     setIsloading(true);
@@ -291,6 +291,7 @@ void APIClient::createBatchInferencesFromJson(const QString &jsonArrayStr)
     if (!doc.isArray()) {
         emit networkError("Invalid JSON array string");
         emit batchCreateFinished(false, 0, 0, QJsonObject());
+        // No loading state to reset since we haven't set it yet
         return;
     }
 
@@ -299,6 +300,7 @@ void APIClient::createBatchInferencesFromJson(const QString &jsonArrayStr)
     if (jsonArray.isEmpty()) {
         emit networkError("Cannot sync empty batch");
         emit batchCreateFinished(false, 0, 0, QJsonObject());
+        // No loading state to reset since we haven't set it yet
         return;
     }
 
@@ -321,33 +323,31 @@ void APIClient::createBatchInferencesFromJson(const QString &jsonArrayStr)
                           }
                           );
 }
-//Auth
-void APIClient::login(const QString &email,const QString &location){
+
+// ===== AUTH METHODS =====
+
+void APIClient::login(const QString &phone, const QString &location)
+{
     setIsloading(true);
     QJsonObject data;
-    data["phone"] = email;
+    data["phone"] = phone;
     data["location"] = location;
-    sendRequest("POST","/auth/login",data,[this](bool success, const QJsonObject &response){
-        if (success && response.contains("token")) {
-            QString token =
-                response["token"].toString();
 
-            setAuthToken(token);
+    sendRequest("POST", "/auth/login", data,
+                [this](bool success, const QJsonObject &response) {
+                    if (success && response.contains("token")) {
+                        QString token = response["token"].toString();
+                        setAuthToken(token);
+                        AppSettings::instance().setAuthToken(token);
+                        AppSettings::instance().setLoggedIn(true);
+                    }
 
-            AppSettings::instance()
-                .setAuthToken(token);
-
-            AppSettings::instance()
-                .setLoggedIn(true);
-        }
-
-        emit loginFinished(success, response);
-
-        setIsloading(false);
-    }
+                    emit loginFinished(success, response);
+                    setIsloading(false);
+                }
                 );
 }
-// Add this method to APIClient.cpp
+
 void APIClient::registerUser(const QString &phoneNumber, const QString &district)
 {
     setIsloading(true);
@@ -369,16 +369,19 @@ void APIClient::registerUser(const QString &phoneNumber, const QString &district
                 );
 }
 
-void APIClient::logout(){
+void APIClient::logout()
+{
+    // Set loading true if logout makes network calls
+    // Since this is just clearing local data, loading state might not be needed
+    // But we'll manage it for consistency
+    setIsloading(true);
+
     m_authToken.clear();
-
-    AppSettings::instance()
-        .setAuthToken("");
-
-    AppSettings::instance()
-        .setLoggedIn(false);
+    AppSettings::instance().setAuthToken("");
+    AppSettings::instance().setLoggedIn(false);
 
     emit authTokenChanged();
-
     emit logoutFinished();
+
+    setIsloading(false);
 }
